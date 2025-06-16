@@ -1,5 +1,6 @@
-# Flight Dynamics Calcs
-
 Calculations, simulations with JSBSim and write up with Marimo notebooks
 
-[A4 Skyhawk Roll Performance](A4SkyhawkRollPerformance.html)
+### [A4 Skyhawk Roll Performance](A4SkyhawkRollPerformance.html)
+
+Can the A4 really roll at 720 deg/s or is it a tall tale? Using some aerodynamic data published by NASA let's take a look.
+ 
