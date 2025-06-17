@@ -9,3 +9,8 @@ Can the A4 really roll at 720 deg/s or is it a tall tale? Using some aerodynamic
 
 ### [Fighter Roll Rates](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Fighter%20Roll%20Rates.py)
 Comparing fighter roll rates based on published aerodynamic data.
+
+### [Aircraft Carrier Flight Path Angles](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Aircraft%20Carrier%20Flight%20Path%20Angles.py)
+
+Flight path angle for carrier approaches based on wind over deck, approach speed and meatball angle.
+
