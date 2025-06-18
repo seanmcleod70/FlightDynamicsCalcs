@@ -31,7 +31,7 @@ def _(math, mo, pss):
 
     $b = 42.8ft$
 
-    Aileron maximum deflection of 30 deg.
+    Aileron maximum deflection of 20 deg.
 
     Ignoring differential horizontal stabilizers?
 
@@ -42,7 +42,7 @@ def _(math, mo, pss):
     |Mach               |0.6   |0.8   |0.8   |0.8|
     |$C_{{l \delta a}}$ |0.048 |0.027 |0.035 |0.045|
     |$C_{{lp}}$         |-0.27 |-0.19 |-0.24 |-0.27|
-    |**$p_{{ss}}$ (deg/s)**|{pss(622.14, 42.8, 0.048, -0.27, math.radians(30)):.0f}|{pss(877.68, 42.8, 0.027, -0.19, math.radians(30)):.0f}|{pss(829.52, 42.8, 0.035, -0.24, math.radians(30)):.0f}|{pss(774.8, 42.8, 0.045, -0.27, math.radians(30)):.0f}|
+    |**$p_{{ss}}$ (deg/s)**|{pss(622.14, 42.8, 0.048, -0.27, math.radians(20)):.0f}|{pss(877.68, 42.8, 0.027, -0.19, math.radians(20)):.0f}|{pss(829.52, 42.8, 0.035, -0.24, math.radians(20)):.0f}|{pss(774.8, 42.8, 0.045, -0.27, math.radians(20)):.0f}|
     """
     )
     return
