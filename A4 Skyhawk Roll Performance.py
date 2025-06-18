@@ -43,6 +43,8 @@ def _(mo):
     {mo.image("public/A4Data1.png")}
 
     {mo.image("public/A4Data2.png")}
+
+    {mo.image("public/A4Data3.png")}
     """
     )
     return
