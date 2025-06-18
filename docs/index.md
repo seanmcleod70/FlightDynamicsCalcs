@@ -11,3 +11,14 @@ Comparing fighter roll rates based on published aerodynamic data.
 ### [Aircraft Carrier Flight Path Angles](AircraftCarrierFlightPathAngles.html)
 
 Flight path angle for carrier approaches based on wind over deck, approach speed and meatball angle.
+
+## Climb Performance using Level Acceleration Test Technique
+
+Examples of processing flight test data collected during a level acceleration test to determine climb performance.
+
+### [Level Acceleration - Energy Height - iLevil](LevelAccelerationEnergyHeightiLevil.html)
+
+### [Level Acceleration - Energy Height - Dynon](LevelAccelerationEnergyHeightDynon.html)
+
+### [Level Acceleration - Nigel Speedy](LevelAccelerationNigelSpeedy.html)
+
