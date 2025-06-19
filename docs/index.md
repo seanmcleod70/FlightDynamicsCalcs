@@ -28,3 +28,8 @@ Examples of processing flight test data collected during a level acceleration te
 
 ### [Level Acceleration - Nigel Speedy](LevelAccelerationNigelSpeedy.html)
 
+## VTOL
+
+### [VTOL Take-off Failure Options](VTOLTake-offFailureOptions.html)
+
+Looking at some of the options in terms of engine failure(s) during a vertical take-off of an aircraft like the Pegasus Vertical Business Jet (VBJ).

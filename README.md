@@ -24,3 +24,9 @@ Examples of processing flight test data collected during a level acceleration te
 
 ### [Level Acceleration - Nigel Speedy](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Level%20Acceleration%20-%20Nigel%20Speedy.py)
 
+## VTOL
+
+### [VTOL Take-off Failure Options](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/VTOL%20Take-off%20Failure%20Options.py)
+
+Looking at some of the options in terms of engine failure(s) during a vertical take-off of an aircraft like the Pegasus Vertical Business Jet (VBJ).
+
