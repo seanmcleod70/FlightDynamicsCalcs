@@ -32,7 +32,7 @@ def _(mo):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(
         rf"""
@@ -40,11 +40,11 @@ def _(mo):
 
     Aerodynamic data for the A-4D Skyhawk from [AIRCRAFT STABILITY AND CONTROL DATA By Gary L. Teper April 1969 NASA report](https://www.robertheffley.com/docs/Data/Teper--NASA_CR-96008.pdf]).
 
-    {mo.image("public/A4Data1.png")}
+    {mo.image("public/A4RollRate/A4Data1.png")}
 
-    {mo.image("public/A4Data2.png")}
+    {mo.image("public/A4RollRate/A4Data2.png")}
 
-    {mo.image("public/A4Data3.png")}
+    {mo.image("public/A4RollRate/A4Data3.png")}
     """
     )
     return

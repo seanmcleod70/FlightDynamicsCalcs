@@ -32,8 +32,7 @@ def _(mo):
     30       | 3.5    | 2.8
     *Based on a 130kt approach speed
 
-    {mo.image("public/Fig4.7-GlideSlope-vs-RHW.png")}
-
+    {mo.image("public/CarrierFlightPath/Fig4.7-GlideSlope-vs-RHW.png")}
     """
     )
     return
@@ -49,7 +48,7 @@ def _(mo):
 
     Some simple trigonometry.
 
-    {mo.image('public/FlightPathTrig.png', width=500)}
+    {mo.image('public/CarrierFlightPath/FlightPathTrig.png', width=500)}
 
     $$ h = AS tan(BA) $$
 
@@ -85,22 +84,22 @@ def _(effectiveFlightPathAngle):
 def _(effectiveFlightPathAngle, plt):
     def plotFPAvsWODGlideslopes():
         plt.figure()
-    
+
         approach_speed = 130
         glide_slopes = [3.0, 3.5, 4.0]
-    
+
         for glide_slope in glide_slopes:
             points = []
             for wod in range(0, 51, 1):
                 points.append((wod, effectiveFlightPathAngle(glide_slope, approach_speed, wod)))
             wind_over_deck, gamma = zip(*points)
             plt.plot(wind_over_deck, gamma, label=f'{glide_slope}° Glideslope')
-            
+
         plt.xlabel('Wind Over Deck (kt)')
         plt.ylabel('Flight Path Angle (deg)')
         plt.legend()
         plt.title('Flight Path Angle vs Wind Over Deck');
-    
+
         plt.show()
 
     plotFPAvsWODGlideslopes()
@@ -111,22 +110,22 @@ def _(effectiveFlightPathAngle, plt):
 def _(effectiveFlightPathAngle, plt):
     def plotFPAvsWODApproachSpeeds():
         plt.figure()
-    
+
         approach_speeds = [110, 130, 150]
         glide_slope = 3.5
-    
+
         for approach_speed in approach_speeds:
             points = []
             for wod in range(0, 51, 1):
                 points.append((wod, effectiveFlightPathAngle(glide_slope, approach_speed, wod)))
             wind_over_deck, gamma = zip(*points)
             plt.plot(wind_over_deck, gamma, label=f'{approach_speed}kt Approach Speed')
-            
+
         plt.xlabel('Wind Over Deck (kt)')
         plt.ylabel('Flight Path Angle (deg)')
         plt.legend()
         plt.title('Flight Path Angle vs Wind Over Deck');
-    
+
         plt.show()
 
     plotFPAvsWODApproachSpeeds()

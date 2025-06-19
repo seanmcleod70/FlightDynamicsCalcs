@@ -20,7 +20,7 @@ def _(mo):
 
 @app.cell
 def _(np):
-    data = np.genfromtxt('data/TestPoint1-iLevil.csv', delimiter=',', names=True)
+    data = np.genfromtxt('data/LevelAcceleration/TestPoint1-iLevil.csv', delimiter=',', names=True)
     return (data,)
 
 
