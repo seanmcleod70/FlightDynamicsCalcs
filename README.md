@@ -34,3 +34,9 @@ Examples of processing flight test data collected during a level acceleration te
 
 Looking at some of the options in terms of engine failure(s) during a vertical take-off of an aircraft like the Pegasus Vertical Business Jet (VBJ).
 
+## Thrust Vectoring
+
+### [Thrust Vectoring Analysis](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Thrust%20Vectoring%20Analysis.py)
+
+Use JSBSim to compare how varying the thrust vector angle can minimize fuel burn for a given flight condition and compare the results to the 
+NASA report - [Optimal Pitch Thrust-Vector Angle and Benefits for all Flight Regimes](https://ntrs.nasa.gov/api/citations/20000034897/downloads/20000034897.pdf).
