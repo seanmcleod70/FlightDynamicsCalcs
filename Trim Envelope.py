@@ -100,7 +100,7 @@ def _():
         ax.set_ylabel('Flight Path Angle $\gamma$ (deg)')
         ax.set_title(f'Trim Envelope - {title}')
 
-    plt.show()
+    plt.gca()
     return
 
 
