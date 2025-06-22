@@ -30,6 +30,12 @@ Examples of processing flight test data collected during a level acceleration te
 
 #### [Level Acceleration - Nigel Speedy](LevelAccelerationNigelSpeedy.html)
 
+### Trim Envelope
+
+#### [Trim Envelope](TrimEnvelope.html)
+
+Calculate the set of trim points for an aircraft over a range of airspeeds and range of flight path angles. The required thrust and AoA is indicated for each trim point.
+
 ## VTOL
 
 #### [VTOL Take-off Failure Options](VTOLTake-offFailureOptions.html)
