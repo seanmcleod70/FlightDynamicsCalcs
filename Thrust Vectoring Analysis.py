@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.14.0"
+__generated_with = "0.14.6"
 app = marimo.App(width="medium")
 
 
@@ -17,6 +17,20 @@ def _(mo):
     Tests performed for a cruise condition and for a climb condition.
     """
     )
+    return
+
+
+@app.cell
+def _(thrust_vector_range_test):
+    # Cruise conditions - 30,000ft Mach 0.8
+    thrust_vector_range_test(30000, 0.8, 0, 'Cruise - 30,000ft Mach 0.8')
+    return
+
+
+@app.cell
+def _(thrust_vector_range_test):
+    # Climb conditions - 15,000ft 300KIAS flight path angle of 3 degrees
+    thrust_vector_range_test(15000, 300, 3, 'Climb - 15,000ft 300KIAS FPA 3 deg')
     return
 
 
@@ -106,15 +120,8 @@ def _():
         ax1.legend(loc='upper center')
         ax2.legend(loc='center right')
 
-        plt.show()
-
-
-    # Cruise conditions - 30,000ft Mach 0.8
-    thrust_vector_range_test(30000, 0.8, 0, 'Cruise - 30,000ft Mach 0.8')
-
-    # Climb conditions - 15,000ft 300KIAS flight path angle of 3 degrees
-    thrust_vector_range_test(15000, 300, 3, 'Climb - 15,000ft 300KIAS FPA 3 deg')
-    return
+        return plt.gca()
+    return (thrust_vector_range_test,)
 
 
 @app.cell
