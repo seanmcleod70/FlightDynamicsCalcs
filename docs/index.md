@@ -51,6 +51,6 @@ NASA report - [Optimal Pitch Thrust-Vector Angle and Benefits for all Flight Reg
 
 ## Flight Test Techniques
 
-### [Rudder Kick](RudderKick.html)
+#### [Rudder Kick](RudderKick.html)
 
 Simulate a pilot performing a rudder kick test by inputing a rudder input based on a ramp input. Aileron input is also included to maintain a steady heading sideslip (SHSS). The time histories of the control inputs and beta (sideslip angle) are plotted.

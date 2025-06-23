@@ -43,7 +43,7 @@ def _():
 
     AIRCRAFT_NAME="737"
     # Path to JSBSim files, location of the folders "aircraft", "engines" and "systems"
-    PATH_TO_JSBSIM_FILES="../JSBSim"
+    PATH_TO_JSBSIM_FILES="data/jsbsim"
 
     # Avoid flooding the console with log messages
     jsbsim.FGJSBBase().debug_lvl = 0
