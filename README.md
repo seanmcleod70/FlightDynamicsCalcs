@@ -48,3 +48,9 @@ Looking at some of the options in terms of engine failure(s) during a vertical t
 
 Use JSBSim to compare how varying the thrust vector angle can minimize fuel burn for a given flight condition and compare the results to the 
 NASA report - [Optimal Pitch Thrust-Vector Angle and Benefits for all Flight Regimes](https://ntrs.nasa.gov/api/citations/20000034897/downloads/20000034897.pdf).
+
+## Flight Test Techniques
+
+### [Rudder Kick](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Rudder%20Kick.py)
+
+Simulate a pilot performing a rudder kick test by inputing a rudder input based on a ramp input. Aileron input is also included to maintain a steady heading sideslip (SHSS). The time histories of the control inputs and beta (sideslip angle) are plotted.
