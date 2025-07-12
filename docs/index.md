@@ -54,3 +54,9 @@ NASA report - [Optimal Pitch Thrust-Vector Angle and Benefits for all Flight Reg
 #### [Rudder Kick](RudderKick.html)
 
 Simulate a pilot performing a rudder kick test by inputing a rudder input based on a ramp input. Aileron input is also included to maintain a steady heading sideslip (SHSS). The time histories of the control inputs and beta (sideslip angle) are plotted.
+
+## Atmosphere
+
+#### [International Standard Atmosphere](InternationalStandardAtmosphere.html)
+
+Calculate the International Standard Atmosphere (ISA) temperature, pressure, density and speed of sound at a given altitude.
