@@ -36,6 +36,12 @@ Examples of processing flight test data collected during a level acceleration te
 
 Calculate the set of trim points for an aircraft over a range of airspeeds and range of flight path angles. The required thrust and AoA is indicated for each trim point.
 
+#### [Optimal Climb Time](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Climb%20Performance.py)
+
+Review the theory of climb performance and then use JSBSim to compare the results to the theory using the excess power calculation and using JSBSim
+to calculate the maximum rate of climb (ROC) using it's trim routine. Lastly compare the results to those from a paper presenting climb performance
+from a TECS based autopilot.
+
 ## VTOL
 
 #### [VTOL Take-off Failure Options](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/VTOL%20Take-off%20Failure%20Options.py)
