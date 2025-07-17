@@ -66,3 +66,7 @@ Simulate a pilot performing a rudder kick test by inputing a rudder input based 
 #### [International Standard Atmosphere](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/International%20Standard%20Atmosphere.py)
 
 Calculate the International Standard Atmosphere (ISA) temperature, pressure, density and speed of sound at a given altitude.
+
+#### [CAS TAS Mach](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/CAS%20TAS%20Mach.py)
+
+Plot routine to calculate and plot the relationship between CAS, TAS and Mach number as altitude varies using the ISA.
