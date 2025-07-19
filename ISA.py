@@ -123,5 +123,24 @@ def TAStoCAS(tas, altitude):
     cas = ISA.StdSL_speed_of_sound * math.sqrt( 5 * ( math.pow(qc/ISA.StdSL_pressure + 1, 2/7) - 1) ) 
     return cas
 
+def CAStoEAS(cas, altitude):
+    """Assume m/s for input and output velocities and m for altitude."""
+    ISA = ISAtmosphere()
+    _, density, _, _ = ISA.state(altitude)
+    _, rho0, _, _ = ISA.state(0)  # Standard sea level density
+    eas = CAStoTAS(cas, altitude) * math.sqrt(density / rho0)
+    return eas
 
+def EAStoTAS(eas, altitude):
+    """Assume m/s for input and output velocities and m for altitude."""
+    ISA = ISAtmosphere()
+    _, density, _, _ = ISA.state(altitude)
+    _, rho0, _, _ = ISA.state(0)  # Standard sea level density
+    tas = eas * math.sqrt(rho0 / density)
+    return tas
 
+def MachtoCAS(mach, altitude):
+    """Assume m for altitude."""
+    ISA = ISAtmosphere()
+    _, _, _, speed_of_sound = ISA.state(altitude)
+    return TAStoCAS(mach * speed_of_sound)
