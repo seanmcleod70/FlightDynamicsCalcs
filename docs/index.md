@@ -72,3 +72,8 @@ Calculate the International Standard Atmosphere (ISA) temperature, pressure, den
 #### [CAS TAS Mach](CASTASMach.html)
 
 Plot routine to calculate and plot the relationship between CAS, TAS and Mach number as altitude varies using the ISA.
+
+#### [EAS - Equivalent Airspeed](EAS.html)
+
+Explanation of Equivalent Airspeed (EAS) and how it relates to IAS, CAS and TAS. The relationship is plotted as altitude varies and airspeed varies.
+
