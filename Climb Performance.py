@@ -45,7 +45,7 @@ def _(mo):
 
     For a steady/non-accelerating climb.
 
-    {mo.image('public/ClimbPerformance/AnglesForces.png', width=400)}
+    {mo.image('public/ClimbPerformance/AnglesForces.png', width=400, caption='Figure 1')}
     """
     )
     return
@@ -77,6 +77,15 @@ def _(mo):
 
     **Question:** Assumption appears to be that $\alpha$ is very small so $\theta \approx \gamma$?
 
+    **Answer:** Came across the following in [Flight Dynamics - Robert Stengel](https://stengel.mycpanel.princeton.edu/FlightDynamics.html)
+
+    > If the thrust is parallel to the aircraft centerline, it is offset from the velocity vector
+    > by the aircraft's angle of attack, and specific excess power, or excess power per unit of weight
+    > is
+    > $SEP = \dfrac{V(T \cos \alpha - D)}{W}$
+
+    Then mentions $\cos \alpha \approx 1$ so drops it from the rest of the equations.
+
     The power required, $P_R$, which is equal to $DV_\infty$, for level flight at a particular 
     altitude is calculated for and plotted against a range of true airspeeds $V_\infty$. 
     The maximum power available, $P_A$, which is equal to $TV_\infty$ at the particular altitude 
@@ -88,7 +97,7 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(rf"""{mo.image('public/ClimbPerformance/ExcessPowerPropellor.png', width=400)}""")
+    mo.md(rf"""{mo.image('public/ClimbPerformance/ExcessPowerPropellor.png', width=400, caption='Figure 2')}""")
     return
 
 
@@ -110,7 +119,7 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(rf"""{mo.image('public/ClimbPerformance/ExcessPowerJet.png', width=400)}""")
+    mo.md(rf"""{mo.image('public/ClimbPerformance/ExcessPowerJet.png', width=400, caption='Figure 3')}""")
     return
 
 
@@ -131,7 +140,7 @@ def _(mo):
     A line drawn from the origin and tangent to the hodograph curve locates point 3. The angle of this line relative
     to the horizontal axis defines the maximum possible climb angle.
 
-    {mo.image('public/ClimbPerformance/Hodograph.png', width=400)}
+    {mo.image('public/ClimbPerformance/Hodograph.png', width=400, caption='Figure 4')}
     """
     )
     return
@@ -245,7 +254,8 @@ def _(RegularGridInterpolator, np, thrust):
     thrust_interpolator = RegularGridInterpolator((alt_grid, mach_grid), thrust)
 
     def max_thrust(alt, mach):
-        return thrust_interpolator([[alt, mach]])[0]
+        bleed_demand = 0.04 # To match JSBSim's bleed demand in CFM56.xml
+        return thrust_interpolator([[alt, mach]])[0] * (1 - bleed_demand)
     return (max_thrust,)
 
 
@@ -328,6 +338,7 @@ def _(jsbsim, math, max_thrust, np):
                 cas = fdm['velocities/vc-kts']
                 weight = fdm['inertia/weight-lbs']
                 drag = fdm['forces/fwx-aero-lbs']
+                #drag = 2 * fdm['propulsion/engine[0]/thrust-lbs']
                 thrust_avail = max_thrust(altitude, mach)
 
                 power_avail = thrust_avail * airspeed * kt2fps
@@ -396,14 +407,7 @@ def _(plot_power_difference):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""
-    **Question:** Should JSBSim's trim routines be able to generate more level trim solutions on the high
-    speed and particularly low speed portions of the envelope in order for $P_R$ and $P_A$ to intersect? Looks
-    like on the low speed end the trim routine is running into a limit with the maximum AoA available at $C_{L_{max}}$.
-    A flaps down configuration would probably result in an intersection.
-    """
-    )
+    mo.md(r"""**Question:** Should JSBSim's trim routines be able to generate more level trim solutions on the low speed portions of the envelope in order for $P_R$ and $P_A$ to intersect? Looks like on the low speed end the trim routine is running into a limit with the maximum AoA available at $C_{L_{max}}$. A flaps down configuration would probably result in an intersection.""")
     return
 
 
@@ -467,7 +471,7 @@ def _(mo):
 
     Previously I'd used JSBSim in order to generate a [Trim Envelope](https://seanmcleod70.github.io/FlightDynamicsCalcs/TrimEnvelope.html) for the 737 model at 15,000ft.
 
-    {mo.image('public/ClimbPerformance/TrimEnvelope.svg')}
+    {mo.image('public/ClimbPerformance/TrimEnvelope.svg', caption='Figure 11')}
 
     It used a brute force approach of trying to calculate a trim solution at each airspeed across a range of 
     flight path angles $\gamma$ from +10 to -10 degrees. The graphs included information on the required amount
@@ -513,7 +517,7 @@ def _(mo):
         r"""
     There is a fairly close match between the graphs showing ROC vs TAS at sea level between the approach using
     excess power and the approach using JSBSim to calculate a trim climb solution for a maximum $\gamma$. With a 
-    peak ROC from the JSBSim trimb climb solution of 97fps versus 104fps for the excess power calculation, i.e. 6.8% less.
+    peak ROC from the JSBSim trimb climb solution of 97fps versus 96fps for the excess power calculation.
     """
     )
     return
@@ -528,28 +532,49 @@ def _(plot_roc_excess_power_climb_trim_comparison):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
+        r"""
+    What is interesting is that from about 150KTAS to 360KTAS the climb trim solution is producing a ROC that is slightly
+    greater than the ROC calculated via the theoritical excess power formula. Looking at figure 1 above, equation (2) above
+    $L = W \cos \theta$ and equation (4) for calculating ROC based on specific excess power there is an assumption that 
+    the drag for level trim and climb trim is identical.
+
+    However as per equation (2) as the flight path angle increases ($\theta$ in equation (2)) the required amount of lift 
+    reduces compared to the amount of lift required for level trim. Which means that the JSBSim trim routine trims the
+    aircraft in the climb at a smaller angle of attack, given that $V$ is constant between level trim and climb trim.
+
+    Given the smaller angle of attack required for climb trim that means the drag is reduced compared to level trim. However
+    equation (4) in calculating the excess power doesn't take this reduction in drag into account, therefore slightly
+    underestimating the ROC that can be achieved.
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
         rf"""
     ## TECS
 
     Summary of TECS from Agostino's slide presentation at NODYCON 2025.
 
-    {mo.image('public/ClimbPerformance/TECSSummary.png')}
+    {mo.image('public/ClimbPerformance/TECSSummary.png', caption='Figure 14')}
 
-    So the throttle controls the total energy available and the elevator conrtols how the energy available is split
+    So the throttle controls the total energy available and the elevator controls how the energy available is split
     between an increase in kinetic energy and an increase in potential energy.
 
     So it seems counterintuitive that you could climb at max ROC with the throttle at less than 100%. Since if the aircraft
     was at the optimal climb speed, i.e. no need for an increase in kinetic energy surely any excess energy over and above
-    what the throttle was supplying at less than 100% could be turned into an increase in potential energy, i.e. to increase the
-    ROC?
+    what the throttle was supplying at less than 100% could be turned into an increase in potential energy, i.e. to increase
+    the ROC?
 
-    Also in terms of the climb theory above less than 100% thrust will result in lower excess power and therefore a lower
+    Also in terms of the climb theory above, less than 100% thrust will result in lower excess power and therefore a lower
     ROC.
 
     I've digitized the following plots to compare the ROC from the TECS based autopilot with the ROC values calculated for
     the contour plot of ROC versus airspeed and altitude, which is based on excess power divided by weight.
 
-    {mo.image('public/ClimbPerformance/TECSROCDigitized.png')}
+    {mo.image('public/ClimbPerformance/TECSROCDigitized.png', caption='Figure 15')}
 
     |Altitude|Throttle|ROC      |Contour Plot ROC|ROC Factor|
     |--------|--------|---------|----------------|----------|
@@ -564,9 +589,9 @@ def _(mo):
     indicated on the contour plot.
 
     The TECS based autopilot followed the velocity setpoint fairly accurately to climb at the optimal airspeed
-    to maximize the ROC as defined by the coontour plots for the specific altitude.
+    to maximize the ROC as defined by the contour plots for the specific altitude.
 
-    {mo.image('public/ClimbPerformance/TECSVelocityTracking.png')}
+    {mo.image('public/ClimbPerformance/TECSVelocityTracking.png', caption='Figure 16')}
 
     However, even though the aircraft was flying at the optimal speed given the reduced thrust below 100% of the
     available thrust it would appear that the aircraft didn't attain the maximum ROC at each point along it's climb, 
@@ -579,12 +604,7 @@ def _(mo):
     In terms of an optimal climb to altitude how achievable is it to exactly match the optimal climb profile based on 
     the contour plot generated using the excess power calculation?
 
-    Firstly in terms of the difference in ROC performance between the excess power calculation and the trim climb 
-    approach, even with the trim climb approach always using pretty much 100% throttle.
-
-    **Question-** Explanation for the difference in performance?
-
-    Secondly even if the aircraft could be trimmed at each altitude at the airspeed for maximum ROC with 100% throttle
+    Even if the aircraft could be trimmed at each altitude at the airspeed for maximum ROC with 100% throttle
     there is often a need for the aircraft to increase it's kinetic energy in order to achieve the airspeed required for
     maximum ROC at a higher altitude. So based on the TECS reservoir analogy in order to increase the kinetic energy
     that means some of the total energy available will then be diverted from achieving the maximum ROC during this transition.
@@ -594,10 +614,10 @@ def _(mo):
 
     |Altitude|TAS|
     |--------|---|
-    |0ft     |330kt|
-    |10,000ft|338kt|
-    |20,000ft|346kt|
-    |30,000ft|379kt|
+    |0ft     |321kt|
+    |10,000ft|330kt|
+    |20,000ft|338kt|
+    |30,000ft|370kt|
     """
     )
     return
@@ -613,7 +633,7 @@ def _(mo):
 def _(alt, mach, np, plt, thrust):
     def plot_thrust_carpet():
         # Create a 3D plot
-        fig = plt.figure(figsize=(8,8))
+        fig = plt.figure(figsize=(8,8), layout='constrained')
         ax = fig.add_subplot(111, projection='3d')
 
         # Plot the surface
@@ -630,6 +650,9 @@ def _(alt, mach, np, plt, thrust):
         ax.set_ylabel('Altitude (ft)')
         ax.set_zlabel('Thrust (k lbf)')
 
+        fig.suptitle('Thrust vs Density Altitude and Mach')
+        fig.supxlabel('Figure 5')
+    
         # Show the plot
         #mo.mpl.interactive(plt.gca())
         return plt.gca()
@@ -639,7 +662,7 @@ def _(alt, mach, np, plt, thrust):
 @app.cell
 def _(np, plt, sim_results):
     def plot_roc():
-        fig = plt.figure(figsize=(16,4))
+        fig = plt.figure(figsize=(16,4), layout='constrained')
         axes = fig.subplots(1, 4)
 
         for i in range(4):
@@ -654,6 +677,8 @@ def _(np, plt, sim_results):
             axes[i].set_ylabel('ROC (fps)')
             axes[i].set_title(f'ROC - {altitude}ft')
 
+        fig.supxlabel('Figure 8')
+    
         return plt.gca()
     return (plot_roc,)
 
@@ -661,7 +686,7 @@ def _(np, plt, sim_results):
 @app.cell
 def _(np, plt, sim_results):
     def plot_roc_combined():
-        plt.figure(figsize=(12, 8))
+        fig = plt.figure(figsize=(12, 8))
 
         for i in range(4):
             altitude = i*10000
@@ -678,6 +703,8 @@ def _(np, plt, sim_results):
         plt.ylabel('ROC (fps)')
         plt.legend()
 
+        fig.supxlabel('Figure 9')
+    
         return plt.gca()
     return (plot_roc_combined,)
 
@@ -685,7 +712,7 @@ def _(np, plt, sim_results):
 @app.cell
 def _(kt2fps, math, np, plt, sim_results):
     def plot_hodograph():
-        figure, axes = plt.subplots(1, 4, figsize=(16, 4))
+        figure, axes = plt.subplots(1, 4, figsize=(16, 4), layout='constrained')
 
         for i in range(4):
             altitude = i*10000
@@ -710,6 +737,8 @@ def _(kt2fps, math, np, plt, sim_results):
             axes[i].set_title(f'Hodograph - {altitude}ft')
             axes[i].legend()
 
+        figure.supxlabel('Figure 10')
+    
         return plt.gca()
     return (plot_hodograph,)
 
@@ -717,7 +746,7 @@ def _(kt2fps, math, np, plt, sim_results):
 @app.cell
 def _(np, plt, sim_results):
     def plot_power_difference():
-        figure, axes = plt.subplots(1, 4, figsize=(16, 4))
+        figure, axes = plt.subplots(1, 4, figsize=(16, 4), layout='constrained')
 
         for i in range(4):
             altitude = i*10000
@@ -738,6 +767,8 @@ def _(np, plt, sim_results):
             axes[i].set_title(f'Power - {altitude}ft')
             axes[i].legend()
 
+        figure.supxlabel('Figure 7')
+    
         return plt.gca()
     return (plot_power_difference,)
 
@@ -745,7 +776,7 @@ def _(np, plt, sim_results):
 @app.cell
 def _(np, plt, sim_results):
     def plot_thrust_difference():
-        figure, axes = plt.subplots(1, 4, figsize=(16, 4))
+        figure, axes = plt.subplots(1, 4, figsize=(16, 4), layout='constrained')
 
         for i in range(4):
             altitude = i*10000
@@ -766,6 +797,8 @@ def _(np, plt, sim_results):
             axes[i].set_title(f'Thrust - {altitude}ft')
             axes[i].legend()
 
+        figure.supxlabel('Figure 6')
+    
         return plt.gca()
     return (plot_thrust_difference,)
 
@@ -852,10 +885,10 @@ def _(jsbsim, kt2fps, math, np):
 @app.cell
 def _(np, plt, sim_climb_results):
     def plot_jsbsim_climb_trim_roc(alt):
-        figure, axes = plt.subplots(1, 4, figsize=(16, 4))
+        figure, axes = plt.subplots(1, 4, figsize=(16, 4), layout='constrained')
 
         results = sim_climb_results[alt]
-    
+
         axes[0].plot(results[:,0], results[:,2])
         axes[1].plot(results[:,0], results[:,1])
         axes[2].plot(results[:,0], results[:,3], label='Climb')
@@ -873,7 +906,7 @@ def _(np, plt, sim_climb_results):
 
         axes[0].scatter(v_roc_max, max_roc, label=f'R/C = {max_roc:.0f}')
         axes[1].scatter(v_roc_max, max_gamma, label=f'$\\gamma$ = {max_gamma:.0f}')
-    
+
         yaxes_info = [ 'ROC (fps)', 'Gamma $\\gamma$', 'Throttle', 'AoA $\\alpha$' ]
 
         for i in range(len(axes)):
@@ -881,6 +914,8 @@ def _(np, plt, sim_climb_results):
             axes[i].set_ylabel(yaxes_info[i])
             axes[i].set_title('Altitude 0ft')
             axes[i].legend()
+
+        figure.supxlabel('Figure 12')
     
         return plt.gca()
     return (plot_jsbsim_climb_trim_roc,)
@@ -891,18 +926,19 @@ def _(plt, sim_climb_results, sim_results):
     # Plot comparison of ROC from excess power calculation versus from max climb trim solution
 
     def plot_roc_excess_power_climb_trim_comparison(alt):
-        figure, axes = plt.subplots(1, 2, figsize=(16, 8))
+        figure, axes = plt.subplots(1, 2, figsize=(16, 8), layout='constrained')
 
         climb_trim_tas = sim_climb_results[alt][:,0]
         climb_trim_roc = sim_climb_results[alt][:,2]
 
         power_tas = sim_results[alt][:,0]
         power_roc = sim_results[alt][:,7]
-    
+
         axes[0].plot(climb_trim_tas, climb_trim_roc, label='Climb Trim')
         axes[0].plot(power_tas, power_roc, label='Excess Power')
 
         axes[1].plot(climb_trim_tas, climb_trim_roc/power_roc)
+        axes[1].axhline(y=1.0, linestyle='--', color='grey')
 
         for axis in axes:
             axis.set_xlabel('TAS (kt)')
@@ -911,15 +947,64 @@ def _(plt, sim_climb_results, sim_results):
         axes[0].set_ylabel('ROC (fps)')
         axes[0].legend()
         axes[1].set_ylabel('Climb Trim ROC / Excess Power ROC')
+
+        figure.supxlabel('Figure 13')
     
         return plt.gca()
     return (plot_roc_excess_power_climb_trim_comparison,)
 
 
 @app.cell
+def _(jsbsim, math):
+    def trim_analysis(tas, alt, gamma):
+        AIRCRAFT_NAME="737"
+        # Path to JSBSim files, location of the folders "aircraft", "engines" and "systems"
+        PATH_TO_JSBSIM_FILES="data/jsbsim"
+
+        # Avoid flooding the console with log messages
+        jsbsim.FGJSBBase().debug_lvl = 0
+
+        fdm = jsbsim.FGFDMExec(PATH_TO_JSBSIM_FILES)
+
+        # Load the aircraft model
+        fdm.load_model(AIRCRAFT_NAME)
+
+        # Set engines running
+        fdm['propulsion/set-running'] = -1
+
+        # Set alpha range for trim solutions
+        fdm['aero/alpha-max-rad'] = math.radians(12)
+        fdm['aero/alpha-min-rad'] = math.radians(-4.0)
+
+        results = []
+
+        fdm['ic/h-sl-ft'] = alt
+        fdm['ic/vt-kts'] = tas
+        fdm['ic/gamma-deg'] = gamma
+
+        # Initialize the aircraft with initial conditions
+        fdm.run_ic()
+
+        # Trim
+        try:
+            fdm['simulation/do_simple_trim'] = 1
+            return (gamma, 
+                    fdm['fcs/throttle-cmd-norm[0]'], 
+                    fdm['aero/alpha-deg'], 
+                    fdm['forces/fwz-aero-lbs'], 
+                    fdm['forces/fwx-aero-lbs'], 
+                    2*fdm['propulsion/engine[0]/thrust-lbs'], 
+                    fdm['inertia/weight-lbs'], 
+                    fdm['velocities/mach'])
+        except jsbsim.TrimFailureError:
+            return None
+    return
+
+
+@app.cell
 def _(max_thrust):
     # 2D interpolation thrust lookup test
-    max_thrust(15000, 0.3)
+    max_thrust(150, 0.498)
     return
 
 
