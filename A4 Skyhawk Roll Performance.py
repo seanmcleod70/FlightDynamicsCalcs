@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.15"
+__generated_with = "0.14.10"
 app = marimo.App(width="medium")
 
 
@@ -87,9 +87,9 @@ def _(mo):
 
     $\Delta \delta_a$ - Aileron deflection angle.
 
-    $L_p$ - Roll moment due to roll rate $p$. Roll damping.
+    $L_p$ - Roll moment derivative due to roll rate $p$. Roll damping.
 
-    $L_{\delta a}$ - Roll moment due to aileron deflection. Aileron control power.
+    $L_{\delta a}$ - Roll moment derivative due to aileron deflection. Aileron control power.
 
     $\tau$ - Time constant, roll constant.
 
