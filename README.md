@@ -76,3 +76,12 @@ Plot routine to calculate and plot the relationship between CAS, TAS and Mach nu
 #### [EAS - Equivalent Airspeed](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/EAS.py)
 
 Explanation of Equivalent Airspeed (EAS) and how it relates to IAS, CAS and TAS. The relationship is plotted as altitude varies and airspeed varies.
+
+## Work In Progress
+
+Notebooks that are still being worked on and not yet ready for prime time.
+
+#### [Generic Global Aerodynamic Model](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Generic%20Global%20Aerodynamic%20Model.py)
+
+#### [JSBSim Aerodynamics](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/JSBSim%20Aerodynamics.py)
+
