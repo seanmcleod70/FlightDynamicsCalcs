@@ -14,7 +14,7 @@ def _(mo):
 
     In creating an FDM for a particular aircraft type the FDM modeller needs to decide what level of fidelity they want to aim for. This will partly be based on the FDM modeller's aim for the project but will also often be dictated by the level of source data available for the aircraft type. 
 
-    JSBSim is a 6 degrees of freedom simulator but doesn't come with any pre-defined forces and moments. The FDM developer needs to supply definitions for each of the forces and moments acting on the aircraft. During each time step JSBSim will then sum the individual forces and moments for each of the 3 axes and then use them to calculate translational and angular accelerations based on the aircraft's current mass and moments of inertia. These accelerations will then be integrated via the equations of motion to calculate an updated pose (3D position and attitude) for the aircraft.
+    JSBSim is a 6 degrees of freedom simulator but doesn't come with any pre-defined forces and moments. The FDM developer needs to supply definitions for each of the forces and moments acting on the aircraft. During each time step JSBSim will then sum the individual forces and moments for each of the 3 axes and then use them to calculate translational and angular accelerations based on the aircraft's current mass and moments of inertia. These accelerations will then be integrated via the equations of motion to calculate updated translational and angular velocities and integrated again for an updated pose (3D position and attitude) for the aircraft.
 
     ## Frames of Reference
 
