@@ -84,3 +84,6 @@ Notebooks that are still being worked on and not yet ready for prime time.
 #### [Generic Global Aerodynamic Model](GenericGlobalAerodynamicModel.html)
 
 #### [JSBSim Aerodynamics](JSBSimAerodynamics.html)
+
+#### [Takeoff Speeds Vmu Vr Vlof](TakeoffSpeedsVmuVrVlof.html)
+

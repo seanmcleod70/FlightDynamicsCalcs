@@ -85,3 +85,5 @@ Notebooks that are still being worked on and not yet ready for prime time.
 
 #### [JSBSim Aerodynamics](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/JSBSim%20Aerodynamics.py)
 
+#### [Takeoff Speeds Vmu Vr Vlof](https://github.com/seanmcleod70/FlightDynamicsCalcs/blob/main/Takeoff%20Speeds%20Vmu%20Vr%20Vlof.py)
+
