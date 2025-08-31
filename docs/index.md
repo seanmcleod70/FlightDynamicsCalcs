@@ -87,3 +87,4 @@ Notebooks that are still being worked on and not yet ready for prime time.
 
 #### [Takeoff Speeds Vmu Vr Vlof](TakeoffSpeedsVmuVrVlof.html)
 
+#### [Ground Effect](GroundEffect.html)
