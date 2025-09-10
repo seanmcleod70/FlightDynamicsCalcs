@@ -101,6 +101,8 @@ def _(
 
     {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ vs AoA', '$C_L$', scaled_version=False)}
 
+    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ vs AoA', '$C_L$', scaled_version=False, xlim=(-1, 16))}
+
     Plotting the results as a scale factor. 
 
     {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ scaling vs AoA for flaps 30', 'Scale Factor', scaled_version=True)}
@@ -176,6 +178,8 @@ def _(
 
     {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ vs AoA', '$C_D$', scaled_version=False)}
 
+    {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ vs AoA', '$C_D$', scaled_version=False, xlim=(-1, 16))}
+
     Plotting the results as a scale factor. 
 
     {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ scaling vs AoA for flaps 30', 'Scale Factor', scaled_version=True)}
@@ -194,7 +198,74 @@ def _(mo):
         r"""
     ### Pitching Moment
 
-    **TODO**
+    $\Delta C_{m_{Ground \space Effect}} = K^B_{GE} \space \Delta C_{m_{GE}}$
+
+    The change in pitching moment due to ground effect takes the same form as the change in lift and drag due to 
+    ground effect, i.e. a change in the pitching moment coefficient based on a scaling factor $K^B_{GE}$ which varies 
+    between 0 and 1 depending on the height of the gear above ground. The $\Delta C_{m_{GE}}$ factor is defined as a 
+    delta in $C_m$ based on a particular flap configuration and versus $\alpha$. Note that the scaling factor $K^B_{GE}$ 
+    used for the pitching moment is the same one as used for lift.
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        rf"""
+    The basic $C_m$ versus $\alpha$ for low speed for different flap configurations, to which the $\Delta C_m$ due to 
+    ground effect will be added.
+
+    {mo.image("public/GroundEffect/CMBasic1.png", width=600)}
+
+    {mo.image("public/GroundEffect/CMBasic2.png", width=600)}
+
+    Ground effect height factor, $K^B_{{GE}}$ based on gear height above ground. Same one used for lift.
+
+    {mo.image("public/GroundEffect/KBGE.png", width=600)}
+
+    The $\Delta C_{{m_{{GE}}}}$ versus $\alpha$ for different flap configurations.
+
+    {mo.image("public/GroundEffect/DeltaCMGE.png", width=600)}
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(
+    mo,
+    plot_CM_groundeffect,
+    plot_CM_groundeffect_AOA,
+    plot_K_B_GE,
+    plot_basic_CM,
+    plot_delta_CM,
+):
+    mo.md(
+        rf"""
+    Digitized plots.
+
+    {plot_basic_CM()}
+
+    {plot_K_B_GE()}
+
+    {plot_delta_CM()}
+
+    So combining $K^B_{{GE}}$ and $\Delta C_{{m_{{GE}}}}$ for the flaps 30 landing configuration we can see the change in 
+    the $C_m$ versus $\alpha$ curves for varying values of $h/b$.
+
+    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ vs AoA', '$C_m$', scaled_version=False)}
+
+    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ vs AoA', '$C_m$', scaled_version=False, xlim=(-1, 16))}
+
+    Plotting the results as a scale factor. 
+
+    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ scaling vs AoA for flaps 30', 'Scale Factor', scaled_version=True)}
+
+    Lastly for a set of fixed $\alpha$ values a plot of the $C_m$ scaling factor versus $h/b$ for a flaps 30 configuration.
+
+    {plot_CM_groundeffect_AOA(30, [0, 5, 10, 14.5], '$C_m$ Scaling vs $h/b$ for flaps 30')}
     """
     )
     return
@@ -265,13 +336,18 @@ def _(np):
     basic_cd_data = np.loadtxt('data/GroundEffect/CD-Curves.csv', delimiter=',', skiprows=1)
     K_A_GE_data = np.loadtxt('data/GroundEffect/KAGE.csv', delimiter=',', skiprows=1)
     delta_cd_data = np.loadtxt('data/GroundEffect/Delta-CDGE.csv', delimiter=',', skiprows=1)
+
+    basic_cm_data = np.loadtxt('data/GroundEffect/CM-Curves.csv', delimiter=',', skiprows=1)
+    delta_cm_data = np.loadtxt('data/GroundEffect/Delta-CMGE.csv', delimiter=',', skiprows=1)
     return (
         K_A_GE_data,
         K_B_GE_data,
         basic_cd_data,
         basic_cl_data,
+        basic_cm_data,
         delta_cd_data,
         delta_cl_data,
+        delta_cm_data,
         jsbsim737_kCDge_data,
         jsbsim737_kCLge_data,
     )
@@ -349,7 +425,7 @@ def _(
     np,
     plt,
 ):
-    def plot_CL_groundeffect(flap, h_bs, title, ylabel, scaled_version):
+    def plot_CL_groundeffect(flap, h_bs, title, ylabel, scaled_version, xlim=None):
 
         fig, ax = plt.subplots()
 
@@ -378,6 +454,9 @@ def _(
         ax.set_title(title)
         ax.legend()
 
+        if xlim is not None:
+            ax.set_xlim(xlim[0], xlim[1])
+    
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_CL_groundeffect,)
 
@@ -462,7 +541,7 @@ def _(
     np,
     plt,
 ):
-    def plot_CD_groundeffect(flap, h_bs, title, ylabel, scaled_version):
+    def plot_CD_groundeffect(flap, h_bs, title, ylabel, scaled_version, xlim=None):
 
         fig, ax = plt.subplots()
 
@@ -491,6 +570,9 @@ def _(
         ax.set_title(title)
         ax.legend()
 
+        if xlim is not None:
+            ax.set_xlim(xlim[0], xlim[1])
+    
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_CD_groundeffect,)
 
@@ -528,6 +610,122 @@ def _(
 
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_CD_groundeffect_AOA,)
+
+
+@app.cell
+def _(basic_cm_data, plot_CM_versus_alpha):
+    def plot_basic_CM():
+        return plot_CM_versus_alpha(basic_cm_data, [10, 20, 25, 30], 'Basic $C_m$ versus $\\alpha$', '$C_m$')
+    return (plot_basic_CM,)
+
+
+@app.cell
+def _(delta_cm_data, plot_CM_versus_alpha):
+    def plot_delta_CM():
+        return plot_CM_versus_alpha(delta_cm_data, [10, 20, 25, 30], '$\\Delta C_{m_{GE}}$ versus $\\alpha$', '$\\Delta C_{m_{GE}}$')
+    return (plot_delta_CM,)
+
+
+@app.cell
+def _(flaps_data_index, flaps_label, mo, plt):
+    def plot_CM_versus_alpha(data, flaps, title, ylabel):
+
+        fig, ax = plt.subplots()
+
+        for flap_setting in flaps:
+            ax.plot(data[:,0], data[:,flaps_data_index(flap_setting)], label=flaps_label(flap_setting))
+
+        ax.set_xlabel('Alpha $\\alpha$ (deg)')
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+
+        ax.legend()
+
+        return mo.md(f"{mo.as_html(fig)}")
+    return (plot_CM_versus_alpha,)
+
+
+@app.cell
+def _(
+    K_B_GE_data,
+    b,
+    basic_cm_data,
+    delta_cm_data,
+    flaps_data_index,
+    flaps_label,
+    mo,
+    np,
+    plt,
+):
+    def plot_CM_groundeffect(flap, h_bs, title, ylabel, scaled_version, xlim=None):
+
+        fig, ax = plt.subplots()
+
+        # Plot basic CM for flap argument
+        if scaled_version is False:
+            ax.plot(basic_cm_data[:,0], basic_cm_data[:,flaps_data_index(flap)], label=flaps_label(flap), color='b')
+
+        # Calculate and plot using K_GE and delta-CM
+        for h_b in h_bs:
+            k_ge = np.interp(h_b * b, np.flip(K_B_GE_data[:,1]), np.flip(K_B_GE_data[:,0]))
+            scaled_delta_cm = delta_cm_data[:,flaps_data_index(flap)] * k_ge
+
+            CM = []
+            for index in range(len(delta_cm_data[:,0])):
+                alpha = delta_cm_data[index,0]
+                cm_basic = np.interp(alpha, basic_cm_data[:,0], basic_cm_data[:,flaps_data_index(flap)])
+                if scaled_version:
+                    CM.append((scaled_delta_cm[index] + cm_basic)/cm_basic)
+                else:
+                    CM.append(scaled_delta_cm[index] + cm_basic)         
+
+            ax.plot(delta_cm_data[:,0], CM, label=f'h/b {h_b}')
+
+        ax.set_xlabel('Alpha $\\alpha$ (deg)')
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.legend()
+
+        if xlim is not None:
+            ax.set_xlim(xlim[0], xlim[1])
+    
+        return mo.md(f"{mo.as_html(fig)}")
+    return (plot_CM_groundeffect,)
+
+
+@app.cell
+def _(
+    K_B_GE_data,
+    b,
+    basic_cm_data,
+    delta_cm_data,
+    flaps_data_index,
+    mo,
+    np,
+    plt,
+):
+    def plot_CM_groundeffect_AOA(flap, alphas, title):
+
+        fig, ax = plt.subplots()
+
+        for alpha in alphas:
+            cm_basic = np.interp(alpha, basic_cm_data[:,0], basic_cm_data[:,flaps_data_index(flap)])
+            cm_delta = np.interp(alpha, delta_cm_data[:,0], delta_cm_data[:,flaps_data_index(flap)])
+            alpha_scale = []
+            hbs = np.linspace(0, 0.4)
+            for hb in hbs:
+                kge = np.interp(hb * b, np.flip(K_B_GE_data[:,1]), np.flip(K_B_GE_data[:,0]))
+                scale = (cm_basic + kge * cm_delta) / cm_basic
+                alpha_scale.append(scale)
+            ax.plot(hbs, alpha_scale, label=f'$\\alpha = {alpha}$')
+
+        ax.set_title(title)
+        ax.set_ylabel('Scale Factor')
+        ax.set_xlabel('$h/b$')
+        ax.legend()
+
+        return mo.md(f"{mo.as_html(fig)}")
+    return (plot_CM_groundeffect_AOA,)
 
 
 @app.cell
