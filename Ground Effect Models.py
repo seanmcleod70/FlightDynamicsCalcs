@@ -5,7 +5,7 @@ app = marimo.App(width="medium")
 
 
 @app.cell(hide_code=True)
-def _(jsbsim737_kCDge_data, jsbsim737_kCLge_data, mo, plot_generic_xy):
+def _(mo):
     mo.md(
         rf"""
     # Ground Effect Models
@@ -13,15 +13,25 @@ def _(jsbsim737_kCDge_data, jsbsim737_kCLge_data, mo, plot_generic_xy):
     In the [Landing - Ground Effect, Flare - JSBSim](https://seanmcleod70.github.io/2018/02/landing-ground-effect-flare-jsbsim/)
     writeup the influence of ground effect was analyzed using the 737 aircraft model from the JSBSim repo during landing.
 
+    In this write up we'll take a look at how the ground effect is modelled by JSBSim's 737 model, by Boeing for a 
+    B747-100 simulator and also by Airbus for a generic civil transport aircraft and then compare the three ground effect models.
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(jsbsim737_kCDge_data, jsbsim737_kCLge_data, mo, plot_generic_xy):
+    mo.md(
+        rf"""
+    ## JSBSim Model
+
     The JSBSim 737 model includes a scale factor for lift and drag based on $h/b$ (height/wingspan) to model ground 
     effect. There is no ground effect modelling for the change in the pitch moment. The $C_L$ and $C_D$ ground effect scale factor is independent of flap configuration and also independent of angle of attack ($\alpha$). 
 
-    {plot_generic_xy(jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1], 'JSBSim 737 $kC_{L_{ge}}$', '$h/b$', '$kC_{L_{ge}}$')}
+    {plot_generic_xy(jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1], 'JSBSim 737 $kC_{L_{ge}}$', '$h/b$', '$kC_{L_{ge}}$', 'Figure 1')}
 
-    {plot_generic_xy(jsbsim737_kCDge_data[:,0], jsbsim737_kCDge_data[:,1], 'JSBSim 737 $kC_{D_{ge}}$', '$h/b$', '$kC_{D_{ge}}$')}
-
-    In this write up we'll take a look at how the ground effect is modelled by Boeing for a B747-100 simulator and 
-    also by Airbus for a generic civil transport aircraft and then compare the three ground effect models.
+    {plot_generic_xy(jsbsim737_kCDge_data[:,0], jsbsim737_kCDge_data[:,1], 'JSBSim 737 $kC_{D_{ge}}$', '$h/b$', '$kC_{D_{ge}}$', 'Figure 2')}
     """
     )
     return
@@ -62,15 +72,15 @@ def _(mo):
     The basic $C_L$ versus $\alpha$ for low speed for different flap configurations, to which the $\Delta C_L$ due to 
     ground effect will be added.
 
-    {mo.image("public/GroundEffect/CLBasic.png", width=600)}
+    {mo.image("public/GroundEffect/CLBasic.png", width=600, caption='Figure 3')}
 
     Ground effect height factor, $K^B_{{GE}}$ based on gear height above ground.
 
-    {mo.image("public/GroundEffect/KBGE.png", width=600)}
+    {mo.image("public/GroundEffect/KBGE.png", width=600, caption='Figure 4')}
 
     The $\Delta C_{{L_{{GE}}}}$ versus $\alpha$ for different flap configurations.
 
-    {mo.image("public/GroundEffect/DeltaCLGE.png", width=600)}
+    {mo.image("public/GroundEffect/DeltaCLGE.png", width=600, caption='Figure 5')}
     """
     )
     return
@@ -91,26 +101,26 @@ def _(
 
     The take-off flap settings for the 747 are flaps 10 or flaps 20 and the landing flap options are flaps 25 or flaps 30.
 
-    {plot_basic_CL()}
+    {plot_basic_CL('Figure 6')}
 
-    {plot_K_B_GE()}
+    {plot_K_B_GE('Figure 7')}
 
-    {plot_delta_CL()}
+    {plot_delta_CL('Figure 8')}
 
     So combining $K^B_{{GE}}$ and $\Delta C_{{L_{{GE}}}}$ for the flaps 30 landing configuration we can see the increase in 
     the $C_L$ versus $\alpha$ curves for varying values of $h/b$.
 
-    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ vs AoA', '$C_L$', scaled_version=False)}
+    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ vs AoA', '$C_L$', 'Figure 9', scaled_version=False)}
 
-    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ vs AoA', '$C_L$', scaled_version=False, xlim=(-1, 16))}
+    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ vs AoA', '$C_L$', 'Figure 10', scaled_version=False, xlim=(-1, 16))}
 
     Plotting the results as a scale factor. 
 
-    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ scaling vs AoA for flaps 30', 'Scale Factor', scaled_version=True)}
+    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ scaling vs AoA for flaps 30', 'Scale Factor', 'Figure 11', scaled_version=True)}
 
     Lastly for a set of fixed $\alpha$ values a plot of the $C_L$ scaling factor versus $h/b$ for a flaps 30 configuration.
 
-    {plot_CL_groundeffect_AOA(30, [0, 5, 10, 14.5], '$C_L$ Scaling vs $h/b$ for flaps 30')}
+    {plot_CL_groundeffect_AOA(30, [0, 5, 10, 14.5], '$C_L$ Scaling vs $h/b$ for flaps 30', 'Figure 12')}
     """
     )
     return
@@ -141,15 +151,15 @@ def _(mo):
     The basic $C_D$ versus $\alpha$ for low speed for different flap configurations, to which the $\Delta C_D$ due to 
     ground effect will be added.
 
-    {mo.image("public/GroundEffect/CDBasic.png", width=600)}
+    {mo.image("public/GroundEffect/CDBasic.png", width=600, caption='Figure 13')}
 
     Ground effect height factor, $K^A_{{GE}}$ based on gear height above ground.
 
-    {mo.image("public/GroundEffect/KAGE.png", width=600)}
+    {mo.image("public/GroundEffect/KAGE.png", width=600, caption='Figure 14')}
 
     The $\Delta C_{{D_{{GE}}}}$ versus $\alpha$ for different flap configurations.
 
-    {mo.image("public/GroundEffect/DeltaCDGE.png", width=600)}
+    {mo.image("public/GroundEffect/DeltaCDGE.png", width=600, caption='Figure 15')}
     """
     )
     return
@@ -168,26 +178,26 @@ def _(
         rf"""
     Digitized plots.
 
-    {plot_basic_CD()}
+    {plot_basic_CD('Figure 16')}
 
-    {plot_K_A_GE()}
+    {plot_K_A_GE('Figure 17')}
 
-    {plot_delta_CD()}
+    {plot_delta_CD('Figure 18')}
 
     So combining $K^A_{{GE}}$ and $\Delta C_{{D_{{GE}}}}$ for the flaps 30 landing configuration we can see the decrease in 
     the $C_D$ versus $\alpha$ curves for varying values of $h/b$.
 
-    {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ vs AoA', '$C_D$', scaled_version=False)}
+    {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ vs AoA', '$C_D$', 'Figure 19', scaled_version=False)}
 
-    {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ vs AoA', '$C_D$', scaled_version=False, xlim=(-1, 16))}
+    {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ vs AoA', '$C_D$', 'Figure 20', scaled_version=False, xlim=(-1, 16))}
 
     Plotting the results as a scale factor. 
 
-    {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ scaling vs AoA for flaps 30', 'Scale Factor', scaled_version=True)}
+    {plot_CD_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_D$ scaling vs AoA for flaps 30', 'Scale Factor', 'Figure 21', scaled_version=True)}
 
     Lastly for a set of fixed $\alpha$ values a plot of the $C_D$ scaling factor versus $h/b$ for a flaps 30 configuration.
 
-    {plot_CD_groundeffect_AOA(30, [0, 5, 10, 14.5], '$C_D$ Scaling vs $h/b$ for flaps 30')}
+    {plot_CD_groundeffect_AOA(30, [0, 5, 10, 14.5], '$C_D$ Scaling vs $h/b$ for flaps 30', 'Figure 22')}
     """
     )
     return
@@ -218,17 +228,17 @@ def _(mo):
     The basic $C_m$ versus $\alpha$ for low speed for different flap configurations, to which the $\Delta C_m$ due to 
     ground effect will be added.
 
-    {mo.image("public/GroundEffect/CMBasic1.png", width=600)}
+    {mo.image("public/GroundEffect/CMBasic1.png", width=600, caption='Figure 23')}
 
-    {mo.image("public/GroundEffect/CMBasic2.png", width=600)}
+    {mo.image("public/GroundEffect/CMBasic2.png", width=600, caption='Figure 24')}
 
     Ground effect height factor, $K^B_{{GE}}$ based on gear height above ground. Same one used for lift.
 
-    {mo.image("public/GroundEffect/KBGE.png", width=600)}
+    {mo.image("public/GroundEffect/KBGE.png", width=600, caption='Figure 25')}
 
     The $\Delta C_{{m_{{GE}}}}$ versus $\alpha$ for different flap configurations.
 
-    {mo.image("public/GroundEffect/DeltaCMGE.png", width=600)}
+    {mo.image("public/GroundEffect/DeltaCMGE.png", width=600, caption='Figure 26')}
     """
     )
     return
@@ -247,26 +257,26 @@ def _(
         rf"""
     Digitized plots.
 
-    {plot_basic_CM()}
+    {plot_basic_CM('Figure 27')}
 
-    {plot_K_B_GE()}
+    {plot_K_B_GE('Figure 28')}
 
-    {plot_delta_CM()}
+    {plot_delta_CM('Figure 29')}
 
     So combining $K^B_{{GE}}$ and $\Delta C_{{m_{{GE}}}}$ for the flaps 30 landing configuration we can see the change in 
     the $C_m$ versus $\alpha$ curves for varying values of $h/b$.
 
-    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ vs AoA', '$C_m$', scaled_version=False)}
+    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ vs AoA', '$C_m$', 'Figure 30', scaled_version=False)}
 
-    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ vs AoA', '$C_m$', scaled_version=False, xlim=(-1, 16))}
+    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ vs AoA', '$C_m$', 'Figure 31', scaled_version=False, xlim=(-1, 16))}
 
     Plotting the results as a scale factor. 
 
-    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ scaling vs AoA for flaps 30', 'Scale Factor', scaled_version=True)}
+    {plot_CM_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_m$ scaling vs AoA for flaps 30', 'Scale Factor', 'Figure 32', scaled_version=True)}
 
     Lastly for a set of fixed $\alpha$ values a plot of the $C_m$ scaling factor versus $h/b$ for a flaps 30 configuration.
 
-    {plot_CM_groundeffect_AOA(30, [0, 5, 10, 14.5], '$C_m$ Scaling vs $h/b$ for flaps 30')}
+    {plot_CM_groundeffect_AOA(30, [0, 5, 10, 14.5], '$C_m$ Scaling vs $h/b$ for flaps 30', 'Figure 33')}
     """
     )
     return
@@ -276,7 +286,7 @@ def _(
 def _(mo):
     mo.md(
         r"""
-    ## Airbus Generic Civil Transport
+    ## Airbus Generic Civil Transport Model
 
     In 2016 ONERA and Airbus proposed [A Civilian Aircraft Landing Challenge](https://w3.onera.fr/smac/sites/default/files/2024-01/CALC_v2.pdf):
 
@@ -316,7 +326,7 @@ def _(mo, plot_airbus_delta_CL):
         rf"""
     Assuming a wingspan of $b = 60.3m$ based on an A330.
 
-    {plot_airbus_delta_CL()}
+    {plot_airbus_delta_CL('Figure 34')}
 
     The lift is modelled only over the linear portion of the $C_L$ versus $\alpha$ curve with:
 
@@ -337,11 +347,11 @@ def _(
 ):
     mo.md(
         rf"""
-    {plot_airbus_lift_plus_delta_ge()}
+    {plot_airbus_lift_plus_delta_ge('Figure 35')}
 
-    {plot_airbus_lift_scaling()}
+    {plot_airbus_lift_scaling('Figure 36')}
 
-    {plot_airbus_lift_scaling_vs_hb()}
+    {plot_airbus_lift_scaling_vs_hb('Figure 37')}
     """
     )
     return
@@ -386,15 +396,56 @@ def _(
 ):
     mo.md(
         rf"""
-    {plot_airbus_basic_cm()}
+    {plot_airbus_basic_cm('Figure 38')}
 
-    {plot_airbus_delta_Cm()}
+    {plot_airbus_delta_Cm('Figure 39')}
 
-    {plot_airbus_delta_Cm_alpha()}
+    {plot_airbus_delta_Cm_alpha('Figure 40')}
 
-    {plot_airbus_net_Cm()}
+    {plot_airbus_net_Cm('Figure 41')}
 
-    {plot_airbus_net_Cm_scaling()}
+    {plot_airbus_net_Cm_scaling('Figure 42')}
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+    ## Summary
+
+    Ground effect models need to model the change in lift, drag and pitching moment as the aircraft transitions through
+    the ground effect zone, typically when the aircarft's AGL is within a wingspan of the aircraft.
+
+    ### Lift
+
+    At small angles of attack the lift 
+
+    > The NTSB found that contradictory information existed in technical literature about the 
+    maximum lift coefficient for airplanes in ground effect. Some sources indicated that the 
+    maximum lift coefficient in ground effect was similar to that in free air (as apparently assumed 
+    by FTE1),106 whereas other sources indicated that the maximum lift coefficient would be reduced 
+    in ground effect. The NTSB determined, through conversations with Gulfstream, other 
+    manufacturers, and the FAA, that the potential for the maximum lift coefficient in ground effect 
+    to be reduced might not be recognized industry-wide. Given the results of Gulfstream‟s CFD 
+    analysis and the findings of this accident investigation, it is clear that the maximum lift 
+    coefficient for at least some airplanes could be reduced in ground effect and that assumptions to 
+    the contrary could result in an overestimation of the stall AOA in ground effect and could 
+    increase the risk of a stall in ground effect with little or no stall warning.
+
+    > 106 -  For example, a peer-reviewed 2007 technical paper by an aerospace engineer (who was employed by a 
+    different airplane manufacturer than Gulfstream) stated, “the aircraft in ground effect possesses a similar [maximum 
+    lift coefficient] as in-flight, but the absolute AOA for stall has reduced.” 
+
+    ### Drag
+
+    > indeed the longitudinal ground effects have not been considered  here since their influence on the control design process remains negligible
+
+    ### Pitching Moment
+
+
     """
     )
     return
@@ -487,18 +538,18 @@ def _(np):
 
 @app.cell
 def _(K_A_GE_data, K_B_GE_data, plot_K_GE):
-    def plot_K_B_GE():
-        return plot_K_GE(K_B_GE_data, "$K^B_{GE}$")
+    def plot_K_B_GE(figure_no):
+        return plot_K_GE(K_B_GE_data, "$K^B_{GE}$", figure_no)
 
-    def plot_K_A_GE():
-        return plot_K_GE(K_A_GE_data, "$K^A_{GE}$")
+    def plot_K_A_GE(figure_no):
+        return plot_K_GE(K_A_GE_data, "$K^A_{GE}$", figure_no)
     return plot_K_A_GE, plot_K_B_GE
 
 
 @app.cell
 def _(b, mo, plt):
-    def plot_K_GE(data, ylabel):
-        fig, ax = plt.subplots()
+    def plot_K_GE(data, ylabel, figure_no):
+        fig, ax = plt.subplots(layout='constrained')
 
         ax.plot(data[:,1], data[:,0])
         ax.set_xlabel("Gear height above ground (ft)")
@@ -507,6 +558,7 @@ def _(b, mo, plt):
 
         ax.set_ylabel(ylabel)
         ax.set_title("Ground Effect Height Factor")
+        fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_K_GE,)
@@ -514,23 +566,23 @@ def _(b, mo, plt):
 
 @app.cell
 def _(basic_cl_data, plot_CL_versus_alpha):
-    def plot_basic_CL():
-        return plot_CL_versus_alpha(basic_cl_data, [10, 20, 25, 30], 'Basic $C_L$ versus $\\alpha$', '$C_L$')
+    def plot_basic_CL(figure_no):
+        return plot_CL_versus_alpha(basic_cl_data, [10, 20, 25, 30], 'Basic $C_L$ versus $\\alpha$', '$C_L$', figure_no)
     return (plot_basic_CL,)
 
 
 @app.cell
 def _(delta_cl_data, plot_CL_versus_alpha):
-    def plot_delta_CL():
-        return plot_CL_versus_alpha(delta_cl_data, [10, 20, 25, 30], '$\\Delta C_{L_{GE}}$ versus $\\alpha$', '$\\Delta C_{L_{GE}}$')
+    def plot_delta_CL(figure_no):
+        return plot_CL_versus_alpha(delta_cl_data, [10, 20, 25, 30], '$\\Delta C_{L_{GE}}$ versus $\\alpha$', '$\\Delta C_{L_{GE}}$', figure_no)
     return (plot_delta_CL,)
 
 
 @app.cell
 def _(flaps_data_index, flaps_label, mo, plt):
-    def plot_CL_versus_alpha(data, flaps, title, ylabel):
+    def plot_CL_versus_alpha(data, flaps, title, ylabel, figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         for flap_setting in flaps:
             ax.plot(data[:,0], data[:,flaps_data_index(flap_setting)], label=flaps_label(flap_setting))
@@ -538,7 +590,8 @@ def _(flaps_data_index, flaps_label, mo, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel(ylabel)
         ax.set_title(title)
-
+        fig.supxlabel(figure_no)
+    
         ax.legend()
 
         return mo.md(f"{mo.as_html(fig)}")
@@ -557,9 +610,9 @@ def _(
     np,
     plt,
 ):
-    def plot_CL_groundeffect(flap, h_bs, title, ylabel, scaled_version, xlim=None):
+    def plot_CL_groundeffect(flap, h_bs, title, ylabel, figure_no, scaled_version, xlim=None):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         # Plot basic CL for flap argument
         if scaled_version is False:
@@ -584,6 +637,7 @@ def _(
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel(ylabel)
         ax.set_title(title)
+        fig.supxlabel(figure_no)
         ax.legend()
 
         if xlim is not None:
@@ -604,9 +658,9 @@ def _(
     np,
     plt,
 ):
-    def plot_CL_groundeffect_AOA(flap, alphas, title):
+    def plot_CL_groundeffect_AOA(flap, alphas, title, figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         for alpha in alphas:
             cl_basic = np.interp(alpha, basic_cl_data[:,0], basic_cl_data[:,flaps_data_index(flap)])
@@ -622,6 +676,7 @@ def _(
         ax.set_title(title)
         ax.set_ylabel('Scale Factor')
         ax.set_xlabel('$h/b$')
+        fig.supxlabel(figure_no)
         ax.legend()
 
         return mo.md(f"{mo.as_html(fig)}")
@@ -630,23 +685,23 @@ def _(
 
 @app.cell
 def _(basic_cd_data, plot_CD_versus_alpha):
-    def plot_basic_CD():
-        return plot_CD_versus_alpha(basic_cd_data, [10, 20, 25, 30], 'Basic $C_D$ versus $\\alpha$', '$C_D$')
+    def plot_basic_CD(figure_no):
+        return plot_CD_versus_alpha(basic_cd_data, [10, 20, 25, 30], 'Basic $C_D$ versus $\\alpha$', '$C_D$', figure_no)
     return (plot_basic_CD,)
 
 
 @app.cell
 def _(delta_cd_data, plot_CD_versus_alpha):
-    def plot_delta_CD():
-        return plot_CD_versus_alpha(delta_cd_data, [10, 20, 25, 30], '$\\Delta C_{D_{GE}}$ versus $\\alpha$', '$\\Delta C_{D_{GE}}$')
+    def plot_delta_CD(figure_no):
+        return plot_CD_versus_alpha(delta_cd_data, [10, 20, 25, 30], '$\\Delta C_{D_{GE}}$ versus $\\alpha$', '$\\Delta C_{D_{GE}}$', figure_no)
     return (plot_delta_CD,)
 
 
 @app.cell
 def _(flaps_data_index, flaps_label, mo, plt):
-    def plot_CD_versus_alpha(data, flaps, title, ylabel):
+    def plot_CD_versus_alpha(data, flaps, title, ylabel, figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         for flap_setting in flaps:
             ax.plot(data[:,0], data[:,flaps_data_index(flap_setting)], label=flaps_label(flap_setting))
@@ -654,6 +709,7 @@ def _(flaps_data_index, flaps_label, mo, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel(ylabel)
         ax.set_title(title)
+        fig.supxlabel(figure_no)
 
         ax.legend()
 
@@ -673,9 +729,9 @@ def _(
     np,
     plt,
 ):
-    def plot_CD_groundeffect(flap, h_bs, title, ylabel, scaled_version, xlim=None):
+    def plot_CD_groundeffect(flap, h_bs, title, ylabel, figure_no, scaled_version, xlim=None):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         # Plot basic CD for flap argument
         if scaled_version is False:
@@ -700,6 +756,7 @@ def _(
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel(ylabel)
         ax.set_title(title)
+        fig.supxlabel(figure_no)
         ax.legend()
 
         if xlim is not None:
@@ -720,9 +777,9 @@ def _(
     np,
     plt,
 ):
-    def plot_CD_groundeffect_AOA(flap, alphas, title):
+    def plot_CD_groundeffect_AOA(flap, alphas, title, figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         for alpha in alphas:
             cd_basic = np.interp(alpha, basic_cd_data[:,0], basic_cd_data[:,flaps_data_index(flap)])
@@ -738,6 +795,7 @@ def _(
         ax.set_title(title)
         ax.set_ylabel('Scale Factor')
         ax.set_xlabel('$h/b$')
+        fig.supxlabel(figure_no)
         ax.legend()
 
         return mo.md(f"{mo.as_html(fig)}")
@@ -746,23 +804,23 @@ def _(
 
 @app.cell
 def _(basic_cm_data, plot_CM_versus_alpha):
-    def plot_basic_CM():
-        return plot_CM_versus_alpha(basic_cm_data, [10, 20, 25, 30], 'Basic $C_m$ versus $\\alpha$', '$C_m$')
+    def plot_basic_CM(figure_no):
+        return plot_CM_versus_alpha(basic_cm_data, [10, 20, 25, 30], 'Basic $C_m$ versus $\\alpha$', '$C_m$', figure_no)
     return (plot_basic_CM,)
 
 
 @app.cell
 def _(delta_cm_data, plot_CM_versus_alpha):
-    def plot_delta_CM():
-        return plot_CM_versus_alpha(delta_cm_data, [10, 20, 25, 30], '$\\Delta C_{m_{GE}}$ versus $\\alpha$', '$\\Delta C_{m_{GE}}$')
+    def plot_delta_CM(figure_no):
+        return plot_CM_versus_alpha(delta_cm_data, [10, 20, 25, 30], '$\\Delta C_{m_{GE}}$ versus $\\alpha$', '$\\Delta C_{m_{GE}}$', figure_no)
     return (plot_delta_CM,)
 
 
 @app.cell
 def _(flaps_data_index, flaps_label, mo, plt):
-    def plot_CM_versus_alpha(data, flaps, title, ylabel):
+    def plot_CM_versus_alpha(data, flaps, title, ylabel, figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         for flap_setting in flaps:
             ax.plot(data[:,0], data[:,flaps_data_index(flap_setting)], label=flaps_label(flap_setting))
@@ -770,6 +828,7 @@ def _(flaps_data_index, flaps_label, mo, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel(ylabel)
         ax.set_title(title)
+        fig.supxlabel(figure_no)
 
         ax.legend()
 
@@ -789,9 +848,9 @@ def _(
     np,
     plt,
 ):
-    def plot_CM_groundeffect(flap, h_bs, title, ylabel, scaled_version, xlim=None):
+    def plot_CM_groundeffect(flap, h_bs, title, ylabel, figure_no, scaled_version, xlim=None):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         # Plot basic CM for flap argument
         if scaled_version is False:
@@ -816,6 +875,7 @@ def _(
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel(ylabel)
         ax.set_title(title)
+        fig.supxlabel(figure_no)
         ax.legend()
 
         if xlim is not None:
@@ -836,9 +896,9 @@ def _(
     np,
     plt,
 ):
-    def plot_CM_groundeffect_AOA(flap, alphas, title):
+    def plot_CM_groundeffect_AOA(flap, alphas, title, figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         for alpha in alphas:
             cm_basic = np.interp(alpha, basic_cm_data[:,0], basic_cm_data[:,flaps_data_index(flap)])
@@ -854,6 +914,7 @@ def _(
         ax.set_title(title)
         ax.set_ylabel('Scale Factor')
         ax.set_xlabel('$h/b$')
+        fig.supxlabel(figure_no)
         ax.legend()
 
         return mo.md(f"{mo.as_html(fig)}")
@@ -862,9 +923,9 @@ def _(
 
 @app.cell
 def _(mo, np, plt):
-    def plot_airbus_delta_CL():
+    def plot_airbus_delta_CL(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         b = 60.3  # A-330 wingspan
         clh = 0.2
@@ -879,6 +940,7 @@ def _(mo, np, plt):
         ax.set_xlabel('$h/b$')
         ax.set_ylabel('$\\Delta C_{L_{GE}}$')
         plt.title('$\\Delta C_{L_{GE}}$ versus $h/b$')
+        fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_airbus_delta_CL,)
@@ -886,9 +948,9 @@ def _(mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_lift_plus_delta_ge():
+    def plot_airbus_lift_plus_delta_ge(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         b = 60.3  # A-330 wingspan
         clh = 0.2
@@ -914,6 +976,7 @@ def _(math, mo, np, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('$C_L$')
         plt.title('$C_L$ vs AoA')
+        fig.supxlabel(figure_no)
     
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_airbus_lift_plus_delta_ge,)
@@ -921,9 +984,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_lift_scaling():
+    def plot_airbus_lift_scaling(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         b = 60.3  # A-330 wingspan
         clh = 0.2
@@ -946,6 +1009,7 @@ def _(math, mo, np, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('Scale Factor')
         plt.title('$C_L$ scaling vs AoA')
+        fig.supxlabel(figure_no)
     
         return mo.md(f"{mo.as_html(fig)}")    
     return (plot_airbus_lift_scaling,)
@@ -953,9 +1017,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_lift_scaling_vs_hb():
+    def plot_airbus_lift_scaling_vs_hb(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         b = 60.3  # A-330 wingspan
         clh = 0.2
@@ -976,6 +1040,7 @@ def _(math, mo, np, plt):
         ax.set_xlabel('$h/b$')
         ax.set_ylabel('Scale Factor')
         plt.title('$C_L$ scaling vs $h/b$')
+        fig.supxlabel(figure_no)
     
         return mo.md(f"{mo.as_html(fig)}")     
     return (plot_airbus_lift_scaling_vs_hb,)
@@ -983,9 +1048,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_basic_cm():
+    def plot_airbus_basic_cm(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         cm_0 = -0.3
         cm_alpha = -1.5 / math.degrees(1)
@@ -997,7 +1062,8 @@ def _(math, mo, np, plt):
     
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('$C_m$')
-        plt.title('Basic $C_m$ versus $\\alpha$')    
+        plt.title('Basic $C_m$ versus $\\alpha$')
+        fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_airbus_basic_cm,)
@@ -1005,9 +1071,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_delta_Cm():
+    def plot_airbus_delta_Cm(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         b = 60.3  # A-330 wingspan
         cm_h0 = -0.09
@@ -1026,6 +1092,7 @@ def _(math, mo, np, plt):
         ax.set_xlabel('$h/b$')
         ax.set_ylabel('$\\Delta C_{m_{GE}}$')
         plt.title('$\\Delta C_{m_{GE}}$ versus $h/b$')
+        fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_airbus_delta_Cm,)
@@ -1033,9 +1100,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_delta_Cm_alpha():
+    def plot_airbus_delta_Cm_alpha(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         b = 60.3  # A-330 wingspan
         cm_h0 = -0.09
@@ -1053,6 +1120,7 @@ def _(math, mo, np, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('$\\Delta C_{m_{GE}}$')
         plt.title('$\\Delta C_{m_{GE}}$ versus AoA')
+        fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}")    
     return (plot_airbus_delta_Cm_alpha,)
@@ -1060,9 +1128,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_net_Cm():
+    def plot_airbus_net_Cm(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
     
         b = 60.3  # A-330 wingspan
         cm_0 = -0.3
@@ -1086,6 +1154,7 @@ def _(math, mo, np, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('$C_m$')
         plt.title('$C_m$ versus AoA')
+        fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}")    
     return (plot_airbus_net_Cm,)
@@ -1093,9 +1162,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(math, mo, np, plt):
-    def plot_airbus_net_Cm_scaling():
+    def plot_airbus_net_Cm_scaling(figure_no):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
     
         b = 60.3  # A-330 wingspan
         cm_0 = -0.3
@@ -1119,6 +1188,7 @@ def _(math, mo, np, plt):
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('Scale Factor')
         plt.title('$C_m$ scaling versus AoA')
+        fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}") 
     return (plot_airbus_net_Cm_scaling,)
@@ -1126,9 +1196,9 @@ def _(math, mo, np, plt):
 
 @app.cell
 def _(mo, plt):
-    def plot_generic_xy(x, y, title, xlabel, ylabel):
+    def plot_generic_xy(x, y, title, xlabel, ylabel, figure_no=None):
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(layout='constrained')
 
         ax.plot(x, y)
 
@@ -1136,6 +1206,9 @@ def _(mo, plt):
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
+        if figure_no is not None:
+            fig.supxlabel(figure_no)
+    
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_generic_xy,)
 
