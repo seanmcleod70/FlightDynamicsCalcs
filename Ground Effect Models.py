@@ -29,7 +29,11 @@ def _(jsbsim737_kCDge_data, jsbsim737_kCLge_data, mo, plot_generic_xy):
     The JSBSim 737 model includes a scale factor for lift and drag based on $h/b$ (height/wingspan) to model ground 
     effect. There is no ground effect modelling for the change in the pitch moment. The $C_L$ and $C_D$ ground effect scale factor is independent of flap configuration and also independent of angle of attack ($\alpha$). 
 
+    ### Lift
+
     {plot_generic_xy(jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1], 'JSBSim 737 $kC_{L_{ge}}$', '$h/b$', '$kC_{L_{ge}}$', 'Figure 1')}
+
+    ### Drag
 
     {plot_generic_xy(jsbsim737_kCDge_data[:,0], jsbsim737_kCDge_data[:,1], 'JSBSim 737 $kC_{D_{ge}}$', '$h/b$', '$kC_{D_{ge}}$', 'Figure 2')}
     """
@@ -411,9 +415,9 @@ def _(
 
 
 @app.cell(hide_code=True)
-def _(mo):
+def _(mo, plot_CL_groundeffect, plot_cl_comparison):
     mo.md(
-        r"""
+        rf"""
     ## Summary
 
     Ground effect models need to model the change in lift, drag and pitching moment as the aircraft transitions through
@@ -421,7 +425,10 @@ def _(mo):
 
     ### Lift
 
-    At small angles of attack the lift 
+    At moderate angles of attack the lift is increased when in ground effect for the same angle of attack.
+
+    However the critical/stall AoA is reduced in ground effect, and for **some** aircraft the maximum lift coefficient
+    is also reduced.
 
     > The NTSB found that contradictory information existed in technical literature about the 
     maximum lift coefficient for airplanes in ground effect. Some sources indicated that the 
@@ -438,6 +445,42 @@ def _(mo):
     > 106 -  For example, a peer-reviewed 2007 technical paper by an aerospace engineer (who was employed by a 
     different airplane manufacturer than Gulfstream) stated, “the aircraft in ground effect possesses a similar [maximum 
     lift coefficient] as in-flight, but the absolute AOA for stall has reduced.” 
+
+    {mo.image("public/GroundEffect/GroundEffectLift.png", width=600, caption='Figure 43')}
+
+    Note that as shown in figures 9 and 10 above for the Boeing model the Boeing lift curves in ground effect
+    don't really match these generic lift curves in terms of the gradient of the $C_L$ vs alpha curve. The Boeing curves
+    start out with a positive delta at 0 alpha, but have a lower gradient compared to the free air case, and therefore
+    end up intersecting the free air curve round an alpha of ~12 deg. The ground effect curves do appear to lead to a 
+    lower critical/stall AoA and lower maximum $C_L$, although unfortunately the Boeing data for the delta $C_L$ in 
+    ground effect ends at 14 deg AoA.
+
+    {plot_CL_groundeffect(30, [0.0, 0.1, 0.2, 0.3], '$C_L$ vs AoA', '$C_L$', 'Figure 9', scaled_version=False)}
+
+    All three models, JSBSim's 737, Boeing's 747-100 and Airbus's generic airliner model the change in lift due to
+    ground effect, however with varying levels of fidelity.
+
+    |Model|$h/b$|AoA|Flap Configuration|
+    |:--|:--|:--|:--|
+    |JSBSim|Yes|No|No|
+    |Airbus|Yes|No|No|
+    |Boeing|Yes|Yes|Yes|
+
+    JSBSim and Airbus don't make use of AoA to vary the amount of delta lift in ground effect. JSBSim also doesn't
+    vary the amount of delta lift based on the flap configuration, nor does the Airbus model, although the Airbus model
+    was specifically only designed for a single flap configuration.
+
+    Whereas the Boeing model's delta lift in ground effect is a function of all 3, i.e. $\Delta C_L = f(h/b, AoA, Flaps)$.
+
+    In terms of comparing all three models on a single graph, the scaling effect on $C_L$ is compared for a single flap 
+    configuration of flaps 30 for the Boeing 747 and at a particular AoA of 5 deg for the Boeing 747. A figure of 5 deg for
+    the AoA for the Boeing model is chosen based on a typical AoA for the landing approach.
+
+    {plot_cl_comparison('Figure 44')}
+
+    The $C_L$ scale factor curves for the JSBSim and Airbus models are very similiar, particularly in terms of their shape,
+    with the JSBSim model being more 'aggressive' in terms of the scale of the effect. However the Boeing curve is quite a
+    bit different.
 
     ### Drag
 
@@ -1192,6 +1235,62 @@ def _(math, mo, np, plt):
 
         return mo.md(f"{mo.as_html(fig)}") 
     return (plot_airbus_net_Cm_scaling,)
+
+
+@app.cell
+def _(
+    K_B_GE_data,
+    basic_cl_data,
+    delta_cl_data,
+    flaps_data_index,
+    jsbsim737_kCLge_data,
+    math,
+    mo,
+    np,
+    plt,
+):
+    def plot_cl_comparison(figure_no):
+
+        fig, ax = plt.subplots(layout='constrained')
+
+        # JSBSim
+        ax.plot(jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1], label='JSBSim')
+
+        # Airbus
+        b = 60.3  # A-330 wingspan
+        clh = 0.2
+        lambdal = 0.12 
+        cl0 = 0.9
+        clalpha = 5.5 / math.degrees(1)    
+        alpha = 5
+        hbs = np.linspace(0, 1, 50)
+        hlg = b * hbs
+        delta_cl = clh * np.exp(-lambdal * hlg)      
+        cl_base = cl0 + clalpha*alpha
+        cl_scaling = (delta_cl + cl_base) / cl_base
+        ax.plot(hbs, cl_scaling, label='Airbus')    
+
+        # Boeing
+        alpha = 5
+        flap = 30
+        cl_basic = np.interp(alpha, basic_cl_data[:,0], basic_cl_data[:,flaps_data_index(flap)])
+        cl_delta = np.interp(alpha, delta_cl_data[:,0], delta_cl_data[:,flaps_data_index(flap)])
+        alpha_scale = []
+        hbs = np.linspace(0, 1.0, 50)
+        for hb in hbs:
+            kge = np.interp(hb * b, np.flip(K_B_GE_data[:,1]), np.flip(K_B_GE_data[:,0]))
+            scale = (cl_basic + kge * cl_delta) / cl_basic
+            alpha_scale.append(scale)
+        ax.plot(hbs, alpha_scale, label='Boeing')    
+    
+        ax.legend()
+        ax.set_xlabel('$h/b$')
+        ax.set_ylabel('Scale Factor')
+        plt.title('$C_L$ Scaling Comparison')
+        fig.supxlabel(figure_no)
+
+        return mo.md(f"{mo.as_html(fig)}")         
+    return (plot_cl_comparison,)
 
 
 @app.cell
