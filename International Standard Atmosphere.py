@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.14.10"
+__generated_with = "0.16.0"
 app = marimo.App(width="medium")
 
 
@@ -259,12 +259,12 @@ def _(mo):
 
 @app.cell
 def _(CAStoMach, ISAtmosphere):
-    def CAStoTAS(cas, altitude):
+    def CAStoTAS(cas, altitude, delta_temp=0):
         """Assume m/s for input and output velocities and m for altitude."""
 
         mach = CAStoMach(cas, altitude)
         ISA = ISAtmosphere()
-        _, _, _, speed_of_sound = ISA.state(altitude)
+        _, _, _, speed_of_sound = ISA.state(altitude, delta_temp)
         return mach * speed_of_sound
     return
 
@@ -277,11 +277,11 @@ def _(mo):
 
 @app.cell
 def _(ISAtmosphere, math):
-    def TAStoCAS(tas, altitude):
+    def TAStoCAS(tas, altitude, delta_temp=0):
         """Assume m/s for input and output velocities and m for altitude."""
 
         ISA = ISAtmosphere()
-        pressure, _, _, speed_of_sound = ISA.state(altitude)
+        pressure, _, _, speed_of_sound = ISA.state(altitude, delta_temp)
 
         mach = tas / speed_of_sound
         qc = pressure * ( math.pow(1 + 0.2*mach**2, 7/2) - 1)
@@ -393,7 +393,7 @@ def _(ISAtmosphere, np, plt):
             'temps': { 'title': 'Temperature vs Altitude', 'xaxis': '$^{\circ}C$'},
             'cs': { 'title': 'Speed of Sound vs Altitude', 'xaxis': '$kt$'}
         }
-    
+
         results = {
             'Std': { 'toffset': 0, 'pressures': [], 'densities': [], 'temps': [], 'cs': [], 'color': 'black', 'label': 'Std' },
             'Hot': { 'toffset': 15, 'pressures': [], 'densities': [], 'temps': [], 'cs': [], 'color': 'red', 'label': '+15C' },
@@ -417,7 +417,7 @@ def _(ISAtmosphere, np, plt):
         plt.title(titles_units[property]['title'])
         plt.xlabel(titles_units[property]['xaxis'])
         plt.ylabel('Geometric Altitude (m)')
-    
+
         plt.legend()
 
         return plt.gca()
