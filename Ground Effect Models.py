@@ -15,6 +15,16 @@ def _(mo):
 
     In this write up we'll take a look at how the ground effect is modelled by JSBSim's 737 model, by Boeing for a 
     B747-100 simulator and also by Airbus for a generic civil transport aircraft and then compare the three ground effect models.
+
+    ## Background
+
+    > Ground effects may be explained by the interaction  of the aircraft wingtip vortices with the ground.
+    > This interaction reduces the strength of these vortices. The  weakened wingtip vortices reduce the wing
+    > downwash which increases the lift and decreases the induced drag, or drag caused by lift.
+    > In addition, the reduced downwash at the wing trailing edge increases the angle of attack  of the relative
+    > wind at the elevator, resulting in a nose down pitching moment. In a fundamental sense, the  change in
+    > downwash near the ground results in a different pressure distribution over the wing, tail, and fuselage.
+    > This distribution alters the aircraft aerodynamic forces and moments.
     """
     )
     return
@@ -27,15 +37,26 @@ def _(jsbsim737_kCDge_data, jsbsim737_kCLge_data, mo, plot_generic_xy):
     ## JSBSim Model
 
     The JSBSim 737 model includes a scale factor for lift and drag based on $h/b$ (height/wingspan) to model ground 
-    effect. There is no ground effect modelling for the change in the pitch moment. The $C_L$ and $C_D$ ground effect scale factor is independent of flap configuration and also independent of angle of attack ($\alpha$). 
+    effect. There is no ground effect modelling for the change in the pitch moment.
 
     ### Lift
+
+    The $kC_{{L_{{ge}}}}$ ground efect scale factor is independent of flap configuration and also independent of angle of attack ($\alpha$).
 
     {plot_generic_xy(jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1], 'JSBSim 737 $kC_{L_{ge}}$', '$h/b$', '$kC_{L_{ge}}$', 'Figure 1')}
 
     ### Drag
 
+    The $kC_{{D_{{ge}}}}$ ground effect scale factor is applied to the induced drag component of the 737's drag model 
+    where the induced drag is proportional to ${{C_L}}^2$. The $kC_{{D_{{ge}}}}$ ground efect scale factor is 
+    independent of flap configuration and also independent of angle of attack ($\alpha$).
+
     {plot_generic_xy(jsbsim737_kCDge_data[:,0], jsbsim737_kCDge_data[:,1], 'JSBSim 737 $kC_{D_{ge}}$', '$h/b$', '$kC_{D_{ge}}$', 'Figure 2')}
+
+    The extra complication is that in ground effect the lift is increased via the $kC_{{L_{{ge}}}}$ scale factor, which 
+    means ${{C_L}}^2$ increases which then increases the induced drag. However the net drag needs to be reduced in ground
+    effect which means the $kC_{{D_{{ge}}}}$ scale factor needs to undo the increase in induced drag due to the increase in
+    lift in ground effect, and then reduce it further in order to have a net reduction in drag in ground effect.
     """
     )
     return
@@ -415,7 +436,12 @@ def _(
 
 
 @app.cell(hide_code=True)
-def _(mo, plot_CL_groundeffect, plot_cl_comparison):
+def _(
+    mo,
+    plot_CL_groundeffect,
+    plot_cl_comparison,
+    plot_cl_comparison_jsbsim_airbus,
+):
     mo.md(
         rf"""
     ## Summary
@@ -472,6 +498,23 @@ def _(mo, plot_CL_groundeffect, plot_cl_comparison):
 
     Whereas the Boeing model's delta lift in ground effect is a function of all 3, i.e. $\Delta C_L = f(h/b, AoA, Flaps)$.
 
+    One parameter not taken into account by any of the three models is the vertical rate of the aircraft through the
+    ground effect region.
+
+    > Ground effects data can be obtained in the wind tunnel or in flight. In conventional wind-tunnel
+    > ground effects testing, measurements are taken for a stationary
+    > aircraft model at various fixed ground heights. The results are called static ground effects data.
+    > Unfortunately, this static data simulates the aircraft flying near the ground at a constant altitude
+    > rather than simulating the transient or dynamic effects of the aircraft descending through a given
+    > altitude, termed "dynamic" ground effects.
+    >
+    > Ground-based techniques have proved successful in more closely duplicating dynamic effects by using
+    > a model that moves toward a stationary or moving ground board in the wind tunnel, thereby simulating
+    > the rate of descent. 
+
+    The [Dynamic Ground Effects Flight Test of an F-15 Aircraft](https://ntrs.nasa.gov/api/citations/19950005778/downloads/19950005778.pdf) measured the change in ground effect
+    based on the sink rate. Higher sink rates lower the increase in $C_L$ due to ground effect.
+
     In terms of comparing all three models on a single graph, the scaling effect on $C_L$ is compared for a single flap 
     configuration of flaps 30 for the Boeing 747 and at a particular AoA of 5 deg for the Boeing 747. A figure of 5 deg for
     the AoA for the Boeing model is chosen based on a typical AoA for the landing approach.
@@ -479,16 +522,32 @@ def _(mo, plot_CL_groundeffect, plot_cl_comparison):
     {plot_cl_comparison('Figure 44')}
 
     The $C_L$ scale factor curves for the JSBSim and Airbus models are very similiar, particularly in terms of their shape,
-    with the JSBSim model being more 'aggressive' in terms of the scale of the effect. However the Boeing curve is quite a
-    bit different.
+    with the JSBSim model being more 'aggressive' in terms of the scale of the effect.
+
+    Using the Airbus formula - $C_{{L_{{H}}}} e^{{- \lambda_L H_{{LG}}}}$ and the following parameters for JSBSim we can 
+    match JSBSim's discretized scale factor curve:
+
+    |Parameter|Airbus|JSBSim|
+    |---------|------|------|
+    |$C_{{L_{{H}}}}$|0.20|0.28|
+    |$\lambda_L$|0.12|0.08|
+
+    {plot_cl_comparison_jsbsim_airbus('Figure 45')}
+
+    However the Boeing curve is quite a bit different.
 
     ### Drag
 
-    > indeed the longitudinal ground effects have not been considered  here since their influence on the control design process remains negligible
+    Only the JSBSim and Boeing models model the change in drag due to ground effect. I asked one of the authors of
+    the Airbus model why they hadn't included the change in drag in their ground effect model:
+
+    > indeed the longitudinal ground effects have not been considered here since their influence on the control design process remains negligible
+
+    Their aim was to have a representative model for designing an autoland control system for handling large cross winds.
+
+
 
     ### Pitching Moment
-
-
     """
     )
     return
@@ -634,7 +693,7 @@ def _(flaps_data_index, flaps_label, mo, plt):
         ax.set_ylabel(ylabel)
         ax.set_title(title)
         fig.supxlabel(figure_no)
-    
+
         ax.legend()
 
         return mo.md(f"{mo.as_html(fig)}")
@@ -1005,11 +1064,11 @@ def _(math, mo, np, plt):
         min_alpha = 0
         max_alpha = 14
         alphas = [min_alpha, max_alpha]
-    
+
         ax.plot(alphas, [cl0 + clalpha*min_alpha, cl0 + clalpha*max_alpha], label='Landing Flaps', color='b')
-    
+
         for hb in [0, 0.1, 0.2, 0.3]:
-        
+
             hlg = b * hb
             delta_cl = clh * np.exp(-lambdal * hlg)
             cls = [cl0 + clalpha*min_alpha + delta_cl, cl0 + clalpha*max_alpha + delta_cl]
@@ -1020,7 +1079,7 @@ def _(math, mo, np, plt):
         ax.set_ylabel('$C_L$')
         plt.title('$C_L$ vs AoA')
         fig.supxlabel(figure_no)
-    
+
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_airbus_lift_plus_delta_ge,)
 
@@ -1041,7 +1100,7 @@ def _(math, mo, np, plt):
         min_alpha = 0
         max_alpha = 14
         alphas = [min_alpha, max_alpha]
-           
+
         for hb in [0, 0.1, 0.2, 0.3]:
             hlg = b * hb
             delta_cl = clh * np.exp(-lambdal * hlg)
@@ -1053,7 +1112,7 @@ def _(math, mo, np, plt):
         ax.set_ylabel('Scale Factor')
         plt.title('$C_L$ scaling vs AoA')
         fig.supxlabel(figure_no)
-    
+
         return mo.md(f"{mo.as_html(fig)}")    
     return (plot_airbus_lift_scaling,)
 
@@ -1084,7 +1143,7 @@ def _(math, mo, np, plt):
         ax.set_ylabel('Scale Factor')
         plt.title('$C_L$ scaling vs $h/b$')
         fig.supxlabel(figure_no)
-    
+
         return mo.md(f"{mo.as_html(fig)}")     
     return (plot_airbus_lift_scaling_vs_hb,)
 
@@ -1100,9 +1159,9 @@ def _(math, mo, np, plt):
 
         alphas = np.linspace(0, 14, 3)
         cms = cm_0 + cm_alpha*alphas
-    
+
         ax.plot(alphas, cms)
-    
+
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('$C_m$')
         plt.title('Basic $C_m$ versus $\\alpha$')
@@ -1151,14 +1210,14 @@ def _(math, mo, np, plt):
         cm_h0 = -0.09
         cm_halpha = -0.9 / math.degrees(1)
         lambda_m = 0.15
-    
+
         alphas = np.linspace(0, 14, 28)
 
         for hb in [0, 0.1, 0.2, 0.3]:
             hlg = b * hb 
             delta_cms = (cm_h0 + cm_halpha * alphas) * np.exp(-lambda_m * hlg)
             ax.plot(alphas, delta_cms, label=f'$h/b$ {hb:.1f}')
-    
+
         ax.legend()
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('$\\Delta C_{m_{GE}}$')
@@ -1174,7 +1233,7 @@ def _(math, mo, np, plt):
     def plot_airbus_net_Cm(figure_no):
 
         fig, ax = plt.subplots(layout='constrained')
-    
+
         b = 60.3  # A-330 wingspan
         cm_0 = -0.3
         cm_alpha = -1.5 / math.degrees(1)
@@ -1184,7 +1243,7 @@ def _(math, mo, np, plt):
 
         alphas = np.linspace(0, 14, 3)
         cms = cm_0 + cm_alpha*alphas
-    
+
         ax.plot(alphas, cms, label='Landing flaps')
 
         for hb in [0, 0.1, 0.2, 0.3]:
@@ -1192,7 +1251,7 @@ def _(math, mo, np, plt):
             alphas = np.linspace(0, 14, 20)
             cm_nets = (cm_h0 + cm_halpha * alphas) * np.exp(-lambda_m * hlg) + cm_0 + cm_alpha * alphas
             ax.plot(alphas, cm_nets, label=f'$h/b$ {hb:.1f}')
-    
+
         ax.legend()
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('$C_m$')
@@ -1208,7 +1267,7 @@ def _(math, mo, np, plt):
     def plot_airbus_net_Cm_scaling(figure_no):
 
         fig, ax = plt.subplots(layout='constrained')
-    
+
         b = 60.3  # A-330 wingspan
         cm_0 = -0.3
         cm_alpha = -1.5 / math.degrees(1)
@@ -1226,7 +1285,7 @@ def _(math, mo, np, plt):
             cm_basic = cm_0 + cm_alpha * alphas
             cm_net_scaling = cm_nets / cm_basic
             ax.plot(alphas, cm_net_scaling, label=f'$h/b$ {hb:.1f}')
-    
+
         ax.legend()
         ax.set_xlabel('Alpha $\\alpha$ (deg)')
         ax.set_ylabel('Scale Factor')
@@ -1282,7 +1341,7 @@ def _(
             scale = (cl_basic + kge * cl_delta) / cl_basic
             alpha_scale.append(scale)
         ax.plot(hbs, alpha_scale, label='Boeing')    
-    
+
         ax.legend()
         ax.set_xlabel('$h/b$')
         ax.set_ylabel('Scale Factor')
@@ -1291,6 +1350,86 @@ def _(
 
         return mo.md(f"{mo.as_html(fig)}")         
     return (plot_cl_comparison,)
+
+
+@app.cell
+def _(jsbsim737_kCLge_data, math, mo, np, plt):
+    def plot_cl_comparison_jsbsim_airbus(figure_no):
+
+        fig, ax = plt.subplots(layout='constrained')
+
+        # JSBSim
+        ax.plot(jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1], label='JSBSim', linestyle='--')
+
+        # Airbus
+        b = 60.3  # A-330 wingspan
+        #clh = 0.2
+        #lambdal = 0.12 
+        clh = 0.28
+        lambdal = 0.08
+        cl0 = 0.9
+        clalpha = 5.5 / math.degrees(1)    
+        alpha = 5
+        hbs = np.linspace(0, 1, 50)
+        hlg = b * hbs
+        delta_cl = clh * np.exp(-lambdal * hlg)      
+        cl_base = cl0 + clalpha*alpha
+        cl_scaling = (delta_cl + cl_base) / cl_base
+        ax.plot(hbs, cl_scaling, label='Airbus Formula')      
+
+        ax.legend()
+        ax.set_xlabel('$h/b$')
+        ax.set_ylabel('Scale Factor')
+        plt.title('$C_L$ Scaling Comparison')
+        fig.supxlabel(figure_no)
+
+        return mo.md(f"{mo.as_html(fig)}")  
+    return (plot_cl_comparison_jsbsim_airbus,)
+
+
+@app.cell
+def _(math, mo, np, plt):
+    def plot_jsbsim_CD_scaling(figure_no=None):
+
+        fig, ax = plt.subplots(layout='constrained')
+
+        for alpha in [0, 5, 10, 13]:
+            hbs = np.linspace(0, 0.8, 30)
+            cl = np.interp(alpha, [0, math.degrees(0.23)], [0.2, 1.2])
+            cd_basic = np.interp(alpha, [0, math.degrees(0.26)], [0.021, 0.042])
+            cdi_clear = cl**2 * 0.043
+            cd_flap = 0.059
+            cd_total_clear = cd_basic + cdi_clear + cd_flap
+
+        
+
+    
+        if figure_no is not None:
+            fig.supxlabel(figure_no)
+
+        return mo.md(f"{mo.as_html(fig)}")
+    return
+
+
+@app.cell
+def _(jsbsim737_kCDge_data, np):
+    # k_ge = np.interp(h_b * b, np.flip(K_B_GE_data[:,1]), np.flip(K_B_GE_data[:,0]))
+    #jsbsim737_kCDge_data[:,1]
+
+    np.interp(0.33, jsbsim737_kCDge_data[:,0], jsbsim737_kCDge_data[:,1])
+    return
+
+
+@app.cell
+def _(jsbsim737_kCDge_data):
+    jsbsim737_kCDge_data
+    return
+
+
+@app.cell
+def _(jsbsim737_kCLge_data):
+    jsbsim737_kCLge_data
+    return
 
 
 @app.cell
@@ -1307,7 +1446,7 @@ def _(mo, plt):
 
         if figure_no is not None:
             fig.supxlabel(figure_no)
-    
+
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_generic_xy,)
 
