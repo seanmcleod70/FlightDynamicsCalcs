@@ -31,7 +31,13 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(jsbsim737_kCDge_data, jsbsim737_kCLge_data, mo, plot_generic_xy):
+def _(
+    jsbsim737_kCDge_data,
+    jsbsim737_kCLge_data,
+    mo,
+    plot_generic_xy,
+    plot_jsbsim_CD_scaling,
+):
     mo.md(
         rf"""
     ## JSBSim Model
@@ -57,6 +63,8 @@ def _(jsbsim737_kCDge_data, jsbsim737_kCLge_data, mo, plot_generic_xy):
     means ${{C_L}}^2$ increases which then increases the induced drag. However the net drag needs to be reduced in ground
     effect which means the $kC_{{D_{{ge}}}}$ scale factor needs to undo the increase in induced drag due to the increase in
     lift in ground effect, and then reduce it further in order to have a net reduction in drag in ground effect.
+
+    {plot_jsbsim_CD_scaling('Figure 3')}
     """
     )
     return
@@ -413,6 +421,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(
     mo,
+    plot_airbus_Cm_scaling_vs_hb,
     plot_airbus_basic_cm,
     plot_airbus_delta_Cm,
     plot_airbus_delta_Cm_alpha,
@@ -430,6 +439,8 @@ def _(
     {plot_airbus_net_Cm('Figure 41')}
 
     {plot_airbus_net_Cm_scaling('Figure 42')}
+
+    {plot_airbus_Cm_scaling_vs_hb('Figure xx')}
     """
     )
     return
@@ -439,8 +450,10 @@ def _(
 def _(
     mo,
     plot_CL_groundeffect,
+    plot_boeing_airbus_Cm_scaling_comparison,
     plot_cl_comparison,
     plot_cl_comparison_jsbsim_airbus,
+    plot_jsbsim_boeing_CD_scaling_comparison,
 ):
     mo.md(
         rf"""
@@ -545,9 +558,11 @@ def _(
 
     Their aim was to have a representative model for designing an autoland control system for handling large cross winds.
 
-
+    {plot_jsbsim_boeing_CD_scaling_comparison('Figure 47')}
 
     ### Pitching Moment
+
+    {plot_boeing_airbus_Cm_scaling_comparison('Figure 48')}
     """
     )
     return
@@ -588,6 +603,7 @@ def _(mo):
 def _():
     import marimo as mo
     import math
+    import copy
     import numpy as np
     import matplotlib.pyplot as plt
     return math, mo, np, plt
@@ -635,6 +651,30 @@ def _(np):
         delta_cm_data,
         jsbsim737_kCDge_data,
         jsbsim737_kCLge_data,
+    )
+
+
+@app.cell
+def _():
+    # Saved data for model comparisons
+    jsbsim737_hbs = []
+    jsbsim737_CD_scaling = []
+    boeing747_hbs = []
+    boeing747_CD_scaling = []
+
+    airbus_Cm_hbs = []
+    airbus_Cm_scaling = []
+    boeing747_Cm_hbs = []
+    boeing747_Cm_scaling = []
+    return (
+        airbus_Cm_hbs,
+        airbus_Cm_scaling,
+        boeing747_CD_scaling,
+        boeing747_Cm_hbs,
+        boeing747_Cm_scaling,
+        boeing747_hbs,
+        jsbsim737_CD_scaling,
+        jsbsim737_hbs,
     )
 
 
@@ -873,6 +913,8 @@ def _(
     K_A_GE_data,
     b,
     basic_cd_data,
+    boeing747_CD_scaling,
+    boeing747_hbs,
     delta_cd_data,
     flaps_data_index,
     mo,
@@ -894,6 +936,15 @@ def _(
                 alpha_scale.append(scale)
             ax.plot(hbs, alpha_scale, label=f'$\\alpha = {alpha}$')
 
+            # Record for comparison with other models
+            if alpha == 5:
+                boeing747_hbs.clear()
+                boeing747_CD_scaling.clear()
+                for hb in hbs:
+                    boeing747_hbs.append(hb)
+                for scale in alpha_scale:
+                    boeing747_CD_scaling.append(scale)
+            
         ax.set_title(title)
         ax.set_ylabel('Scale Factor')
         ax.set_xlabel('$h/b$')
@@ -992,6 +1043,8 @@ def _(
     K_B_GE_data,
     b,
     basic_cm_data,
+    boeing747_Cm_hbs,
+    boeing747_Cm_scaling,
     delta_cm_data,
     flaps_data_index,
     mo,
@@ -1012,6 +1065,15 @@ def _(
                 scale = (cm_basic + kge * cm_delta) / cm_basic
                 alpha_scale.append(scale)
             ax.plot(hbs, alpha_scale, label=f'$\\alpha = {alpha}$')
+
+            # Record for comparison with other models
+            if alpha == 5:
+                boeing747_Cm_hbs.clear()
+                boeing747_Cm_scaling.clear()
+                for hb in hbs:
+                    boeing747_Cm_hbs.append(hb)
+                for scale in alpha_scale:
+                    boeing747_Cm_scaling.append(scale)
 
         ax.set_title(title)
         ax.set_ylabel('Scale Factor')
@@ -1297,6 +1359,49 @@ def _(math, mo, np, plt):
 
 
 @app.cell
+def _(airbus_Cm_hbs, airbus_Cm_scaling, math, mo, np, plt):
+    def plot_airbus_Cm_scaling_vs_hb(figure_no):
+
+        fig, ax = plt.subplots(layout='constrained')
+
+        b = 60.3  # A-330 wingspan
+        cm_0 = -0.3
+        cm_alpha = -1.5 / math.degrees(1)
+        cm_h0 = -0.09
+        cm_halpha = -0.9 / math.degrees(1)
+        lambda_m = 0.15    
+
+        hbs = np.linspace(0, 0.4, 20)
+    
+        for alpha in [0, 5, 10, 14.5]:
+            cm_scale_factor = []
+            cm_free = cm_0 + cm_alpha * alpha
+            for hb in hbs:
+                hlg = b * hb          
+                cm_ge = cm_free + (cm_h0 + cm_halpha * alpha) * np.exp(-lambda_m * hlg)
+                cm_scaling = cm_ge / cm_free
+                cm_scale_factor.append(cm_scaling)
+            ax.plot(hbs, cm_scale_factor, label=f'$\\alpha$ = {alpha}')
+
+            # Record for comparison with other models
+            airbus_Cm_hbs.clear()
+            airbus_Cm_scaling.clear()
+            for hb in hbs:
+                airbus_Cm_hbs.append(hb)
+            for scale in cm_scale_factor:
+                airbus_Cm_scaling.append(scale)
+
+        ax.legend()
+        ax.set_xlabel('$h/b$')
+        ax.set_ylabel('Scale Factor')
+        plt.title('$C_m$ scaling vs $h/b$')
+        fig.supxlabel(figure_no)
+
+        return mo.md(f"{mo.as_html(fig)}") 
+    return (plot_airbus_Cm_scaling_vs_hb,)
+
+
+@app.cell
 def _(
     K_B_GE_data,
     basic_cl_data,
@@ -1388,48 +1493,115 @@ def _(jsbsim737_kCLge_data, math, mo, np, plt):
 
 
 @app.cell
-def _(math, mo, np, plt):
+def _(
+    jsbsim737_CD_scaling,
+    jsbsim737_hbs,
+    jsbsim737_kCDge_data,
+    jsbsim737_kCLge_data,
+    math,
+    mo,
+    np,
+    plt,
+):
     def plot_jsbsim_CD_scaling(figure_no=None):
 
         fig, ax = plt.subplots(layout='constrained')
 
         for alpha in [0, 5, 10, 13]:
             hbs = np.linspace(0, 0.8, 30)
-            cl = np.interp(alpha, [0, math.degrees(0.23)], [0.2, 1.2])
+            cl_clear = np.interp(alpha, [0, math.degrees(0.23)], [0.2, 1.2])
             cd_basic = np.interp(alpha, [0, math.degrees(0.26)], [0.021, 0.042])
-            cdi_clear = cl**2 * 0.043
+            cdi_clear = cl_clear**2 * 0.043
             cd_flap = 0.059
             cd_total_clear = cd_basic + cdi_clear + cd_flap
 
-        
+            scale_factors = []
+            for hb in hbs:
+                kCLge = np.interp(hb, jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1])
+                cl_ge = np.interp(alpha, [0, math.degrees(0.23)], [0.2, 1.2]) * kCLge
+                kCDge = np.interp(hb, jsbsim737_kCDge_data[:,0], jsbsim737_kCDge_data[:,1])
+                cdi_ge = cl_ge**2 * 0.043 * kCDge
+                cd_total_ge = cd_basic + cdi_ge + cd_flap
+                scale_factors.append(cd_total_ge/cd_total_clear)
 
-    
+            # Record alpha == 5 case for comparison with other models
+            if alpha == 5:
+                jsbsim737_hbs.clear()
+                jsbsim737_CD_scaling.clear()
+                for hb in hbs:
+                    jsbsim737_hbs.append(hb)
+                for scale in scale_factors:
+                    jsbsim737_CD_scaling.append(scale)
+                    #jsbsim737_CD_scaling = copy.deepcopy(scale_factors)
+            
+            ax.plot(hbs, scale_factors, label=f'$\\alpha$ = {alpha}')
+
+        ax.legend()
+        ax.set_xlabel('$h/b$')
+        ax.set_ylabel('Scale Factor')
+        plt.title('JSBSim $C_D$ Scaling versus $h/b$')    
+
         if figure_no is not None:
             fig.supxlabel(figure_no)
 
         return mo.md(f"{mo.as_html(fig)}")
-    return
+    return (plot_jsbsim_CD_scaling,)
 
 
 @app.cell
-def _(jsbsim737_kCDge_data, np):
-    # k_ge = np.interp(h_b * b, np.flip(K_B_GE_data[:,1]), np.flip(K_B_GE_data[:,0]))
-    #jsbsim737_kCDge_data[:,1]
+def _(
+    boeing747_CD_scaling,
+    boeing747_hbs,
+    jsbsim737_CD_scaling,
+    jsbsim737_hbs,
+    mo,
+    plt,
+):
+    def plot_jsbsim_boeing_CD_scaling_comparison(figure_no):
 
-    np.interp(0.33, jsbsim737_kCDge_data[:,0], jsbsim737_kCDge_data[:,1])
-    return
+        fig, ax = plt.subplots(layout='constrained')
+
+        ax.plot(jsbsim737_hbs, jsbsim737_CD_scaling, label='JSBSim')
+        ax.plot(boeing747_hbs, boeing747_CD_scaling, label='Boeing')
+    
+        ax.legend()
+        ax.set_xlabel('$h/b$')
+        ax.set_ylabel('Scale Factor')
+        plt.title('$C_D$ Scaling Comparison at $\\alpha$ = 5')    
+
+        if figure_no is not None:
+            fig.supxlabel(figure_no)
+    
+        return mo.md(f"{mo.as_html(fig)}")
+    return (plot_jsbsim_boeing_CD_scaling_comparison,)
 
 
 @app.cell
-def _(jsbsim737_kCDge_data):
-    jsbsim737_kCDge_data
-    return
+def _(
+    airbus_Cm_hbs,
+    airbus_Cm_scaling,
+    boeing747_Cm_hbs,
+    boeing747_Cm_scaling,
+    mo,
+    plt,
+):
+    def plot_boeing_airbus_Cm_scaling_comparison(figure_no):
 
+        fig, ax = plt.subplots(layout='constrained')
 
-@app.cell
-def _(jsbsim737_kCLge_data):
-    jsbsim737_kCLge_data
-    return
+        ax.plot(airbus_Cm_hbs, airbus_Cm_scaling, label='Airbus')
+        ax.plot(boeing747_Cm_hbs, boeing747_Cm_scaling, label='Boeing')
+    
+        ax.legend()
+        ax.set_xlabel('$h/b$')
+        ax.set_ylabel('Scale Factor')
+        plt.title('$C_m$ Scaling Comparison at $\\alpha$ = 5')    
+
+        if figure_no is not None:
+            fig.supxlabel(figure_no)
+    
+        return mo.md(f"{mo.as_html(fig)}")
+    return (plot_boeing_airbus_Cm_scaling_comparison,)
 
 
 @app.cell
