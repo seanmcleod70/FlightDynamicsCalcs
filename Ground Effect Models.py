@@ -1463,46 +1463,47 @@ def _(
     plt,
 ):
     def plot_cl_comparison(figure_no):
-
-        fig, ax = plt.subplots(layout='constrained')
+    
+        fig, ax = plt.subplots(layout="constrained")
 
         # JSBSim
-        ax.plot(jsbsim737_kCLge_data[:,0], jsbsim737_kCLge_data[:,1], label='JSBSim')
+        ax.plot(jsbsim737_kCLge_data[:, 0], jsbsim737_kCLge_data[:, 1], label="JSBSim")
 
         # Airbus
         b = 60.3  # A-330 wingspan
         clh = 0.2
-        lambdal = 0.12 
+        lambdal = 0.12
         cl0 = 0.9
-        clalpha = 5.5 / math.degrees(1)    
+        clalpha = 5.5 / math.degrees(1)
         alpha = 5
         hbs = np.linspace(0, 1, 50)
         hlg = b * hbs
-        delta_cl = clh * np.exp(-lambdal * hlg)      
-        cl_base = cl0 + clalpha*alpha
+        delta_cl = clh * np.exp(-lambdal * hlg)
+        cl_base = cl0 + clalpha * alpha
         cl_scaling = (delta_cl + cl_base) / cl_base
-        ax.plot(hbs, cl_scaling, label='Airbus')    
+        ax.plot(hbs, cl_scaling, label="Airbus")
 
         # Boeing
         alpha = 5
         flap = 30
-        cl_basic = np.interp(alpha, basic_cl_data[:,0], basic_cl_data[:,flaps_data_index(flap)])
-        cl_delta = np.interp(alpha, delta_cl_data[:,0], delta_cl_data[:,flaps_data_index(flap)])
+        b = 195.68 # feet
+        cl_basic = np.interp(alpha, basic_cl_data[:, 0], basic_cl_data[:, flaps_data_index(flap)])
+        cl_delta = np.interp(alpha, delta_cl_data[:, 0], delta_cl_data[:, flaps_data_index(flap)])
         alpha_scale = []
         hbs = np.linspace(0, 1.0, 50)
         for hb in hbs:
-            kge = np.interp(hb * b, np.flip(K_B_GE_data[:,1]), np.flip(K_B_GE_data[:,0]))
+            kge = np.interp(hb * b, np.flip(K_B_GE_data[:, 1]), np.flip(K_B_GE_data[:, 0]))
             scale = (cl_basic + kge * cl_delta) / cl_basic
             alpha_scale.append(scale)
-        ax.plot(hbs, alpha_scale, label='Boeing')    
+        ax.plot(hbs, alpha_scale, label="Boeing")
 
         ax.legend()
-        ax.set_xlabel('$h/b$')
-        ax.set_ylabel('Scale Factor')
-        plt.title('$C_L$ Scaling Comparison')
+        ax.set_xlabel("$h/b$")
+        ax.set_ylabel("Scale Factor")
+        plt.title("$C_L$ Scaling Comparison")
         fig.supxlabel(figure_no)
 
-        return mo.md(f"{mo.as_html(fig)}")         
+        return mo.md(f"{mo.as_html(fig)}")
     return (plot_cl_comparison,)
 
 
