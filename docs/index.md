@@ -77,6 +77,14 @@ Plot routine to calculate and plot the relationship between CAS, TAS and Mach nu
 
 Explanation of Equivalent Airspeed (EAS) and how it relates to IAS, CAS and TAS. The relationship is plotted as altitude varies and airspeed varies.
 
+## Ground Effect
+
+#### [Ground Effect Models](GroundEffectModels.html)
+
+Comparison of different ground effect models to model the change in lift, drag and pitching moment as a function of height above ground.
+A 747 simulator model provided by Boeing, a generic airliner model provided by Airbus  for an autoland challenge and a common JSBSim model
+are detailed and compared.
+
 ## Work In Progress
 
 Notebooks that are still being worked on and not yet ready for prime time.
@@ -87,4 +95,4 @@ Notebooks that are still being worked on and not yet ready for prime time.
 
 #### [Takeoff Speeds Vmu Vr Vlof](TakeoffSpeedsVmuVrVlof.html)
 
-#### [Ground Effect Models](GroundEffectModels.html)
+
