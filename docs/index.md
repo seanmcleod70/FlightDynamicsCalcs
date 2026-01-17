@@ -85,6 +85,13 @@ Comparison of different ground effect models to model the change in lift, drag a
 A 747 simulator model provided by Boeing, a generic airliner model provided by Airbus  for an autoland challenge and a common JSBSim model
 are detailed and compared.
 
+## Dynamic Pressure
+
+#### [Max Q - Maximum Dynamic Pressure](MaxQ.html)
+
+Maximum dynamic pressure experienced by a SpaceX rocket, the Space Shuttle and an airliner.
+
+
 ## Work In Progress
 
 Notebooks that are still being worked on and not yet ready for prime time.
