@@ -20,6 +20,10 @@ class ISAtmosphere:
         AtmosphereBand(0,     11000, 288.15, 101325,    -0.0065),
         AtmosphereBand(11000, 20000, 216.65, 22632,     0.0),
         AtmosphereBand(20000, 32000, 216.65, 5474.9,    0.001),
+        AtmosphereBand(32000, 47000, 228.65, 868.02,    0.0028),
+        AtmosphereBand(47000, 51000, 270.65, 110.91,    0.0),
+        AtmosphereBand(51000, 71000, 270.65, 66.939,    -0.0028),
+        AtmosphereBand(71000, 84852, 214.65, 3.9564,    -0.002),
         ]
 
     def geopotential_altitude(self, geometric_altitude):
