@@ -89,10 +89,10 @@ def _(ISA, mo, plt):
         alts = []
         rhos = []
         speed_of_sounds = []
-    
+
         for h in range(0, 260001, 1000):
             _, rho, temp, speed_of_sound = ISA.state(h*0.3048) # ft to m
-        
+
             alts.append(h)
             rhos.append(rho)
             speed_of_sounds.append(speed_of_sound*1.944012) # m/s to knots
@@ -146,18 +146,28 @@ def _():
             machs.append(mach)
 
         return (times, machs)
-    return altitude_mission_altitude, load_mission_mach, speed_mission_altitude
+    return altitude_mission_altitude, load_mission_mach
+
+
+@app.cell
+def _(plot_mission):
+    def plot_altitude_mission():
+        return plot_mission('Altitude Mission', 'upper left', 'x-15-altitude-mission-mach.csv')
+
+    def plot_speed_mission():
+        return plot_mission('Speed Mission', 'upper right', 'x-15-speed-mission-mach.csv')    
+    return plot_altitude_mission, plot_speed_mission
 
 
 @app.cell
 def _(ISA, altitude_mission_altitude, load_mission_mach, mo, np, plt):
-    def plot_altitude_mission():
+    def plot_mission(title, legend_location, mach_file):
         fig = plt.figure(layout='constrained', figsize=(10, 5))
         host = fig.add_subplot(111)
 
         par1 = host.twinx()
         par2 = host.twinx()
-    
+
         host.set_ylim(0, 280)
         par1.set_ylim(0, 7)
         par2.set_ylim(0, 30)
@@ -182,7 +192,7 @@ def _(ISA, altitude_mission_altitude, load_mission_mach, mo, np, plt):
             alts.append(alt)    
 
         # Mach
-        mach_times, machs_raw = load_mission_mach('data/X-15-MaxQ/x-15-altitude-mission-mach.csv')    
+        mach_times, machs_raw = load_mission_mach(f'data/X-15-MaxQ/{mach_file}')    
         machs = []
         for t in range(0, 261, 1):
             mach = np.interp(t, mach_times, machs_raw)
@@ -195,12 +205,12 @@ def _(ISA, altitude_mission_altitude, load_mission_mach, mo, np, plt):
             h = alts[i] * 1000
 
             _, rho, temp, speed_of_sound = ISA.state(h*0.3048) # ft to m
-        
+
             v = mach * speed_of_sound
 
             q = 0.5 * rho * v**2
             qs.append(q/1000) # kPa
-        
+
             if q > maxq:
                 maxq = q
                 maxq_time = i
@@ -215,7 +225,7 @@ def _(ISA, altitude_mission_altitude, load_mission_mach, mo, np, plt):
         #print(maxq_time, maxq_alt, maxq_mach, maxq/1000)
 
         lns = [p1, p2, p3]
-        host.legend(handles=lns, loc='upper left')
+        host.legend(handles=lns, loc=legend_location)
 
         par2.spines['right'].set_position(('outward', 40)) 
 
@@ -223,91 +233,10 @@ def _(ISA, altitude_mission_altitude, load_mission_mach, mo, np, plt):
         par1.yaxis.label.set_color(p2.get_color())
         par2.yaxis.label.set_color(p3.get_color())
 
-        plt.title('Altitude Mission')
+        plt.title(title)
 
         return mo.md(f"{mo.as_html(fig)}")
-    return (plot_altitude_mission,)
-
-
-@app.cell
-def _(ISA, load_mission_mach, mo, np, plt, speed_mission_altitude):
-    def plot_speed_mission():
-        fig = plt.figure(layout='constrained', figsize=(10, 5))
-        host = fig.add_subplot(111)
-
-        par1 = host.twinx()
-        par2 = host.twinx()
-    
-        host.set_ylim(0, 280)
-        par1.set_ylim(0, 7)
-        par2.set_ylim(0, 30)
-
-        host.set_xlabel('Time (s)')
-        host.set_ylabel('Altitude (1000 ft)')
-        par1.set_ylabel('Mach')
-        par2.set_ylabel('Dynamic Pressure (kPa)')
-
-        times = []
-        times = []
-        maxq = 0
-        maxq_time = 0
-        maxq_mach = 0
-        maxq_alt = 0
-
-        # Altitude
-        alts = []
-
-        for t in range(0, 261, 1):
-            alt = speed_mission_altitude(t)
-            times.append(t)
-            alts.append(alt)    
-
-        # Mach
-        mach_times, machs_raw = load_mission_mach('data/X-15-MaxQ/X-15-speed-mission-mach.csv')    
-        machs = []
-        for t in range(0, 261, 1):
-            mach = np.interp(t, mach_times, machs_raw)
-            machs.append(mach)
-
-        # Dynamic pressure
-        qs = []
-        for i in range(0, len(times)):
-            mach = machs[i]
-            h = alts[i] * 1000
-
-            _, rho, temp, speed_of_sound = ISA.state(h*0.3048) # ft to m
-        
-            v = mach * speed_of_sound
-
-            q = 0.5 * rho * v**2
-            qs.append(q/1000) # kPa
-        
-            if q > maxq:
-                maxq = q
-                maxq_time = i
-                maxq_mach = mach
-                maxq_alt = h
-
-        p1, = host.plot(times, alts, label='Altitude (1000 ft)')
-        p2, = par1.plot(times, machs, color='r', label='Mach')
-        p3, = par2.plot(times, qs, color='g', label='Dynamic Pressure (kPa)' )
-
-        #plt.axvline(x=maxq_time)
-        #print(maxq_time, maxq_alt, maxq_mach, maxq/1000)
-
-        lns = [p1, p2, p3]
-        host.legend(handles=lns, loc='upper right')
-
-        par2.spines['right'].set_position(('outward', 40)) 
-
-        host.yaxis.label.set_color(p1.get_color())
-        par1.yaxis.label.set_color(p2.get_color())
-        par2.yaxis.label.set_color(p3.get_color())
-
-        plt.title('Speed Mission')
-
-        return mo.md(f"{mo.as_html(fig)}")
-    return (plot_speed_mission,)
+    return (plot_mission,)
 
 
 @app.cell
