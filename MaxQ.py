@@ -48,6 +48,10 @@ def _(mo, plot_airliner, plot_nasa_sts124, plot_spacex_jcsat14):
 
     So it looks like the maximum dynamic pressure is experienced at cruising altitude and cruising speed and roughly peaks around 25 kPa. In other words an airliner’s maximum dynamic pressure that it experiences is roughly in the same ball park as experienced by a SpaceX rocket and the Space Shuttle and the airliner experiences it at roughly the same altitude.
 
+    Actually on further review, a TAS of 642kt at 32,000ft would equate to Mach 1.1, so there definitely was a large wind
+    component. Assuming a typical maximum Mach of 0.85 for an airliner at cruising altitude, that equates to a dynamic
+    pressure of 11 kPa, so actually a little less than half compared to the SpaceX rocket and the Space Shuttle.
+
     To get a feel for how much pressure 25 - 35 kPa is remember it’s the equivalent to 25,000 - 35,000 $\frac{{N}}{{m^2}}$.
     Which is roughly 2,500 - 3,500 kg sitting on a 1 square meter surface.
 
@@ -78,7 +82,7 @@ def _(ISA):
     def std_atmosphere_densities(start, end, increment):
         alts = []
         rhos = []
-    
+
         for h in range(start, end, increment):
             _, rho, _, _ = ISA.state(h)    
             alts.append(h/1000)
@@ -109,7 +113,7 @@ def _(ISA, mo, plt, std_atmosphere_densities):
             velocities_squared.append(velocity*velocity)
 
             _, rho, _, _ = ISA.state(alt*1000) # km to m
-        
+
             velocity_ms = (velocity * 1000) / (60 * 60)
             dynamic_pressure = 0.5 * rho * velocity_ms**2
             qs.append(dynamic_pressure / 1000)  # kilo pascals
@@ -143,7 +147,7 @@ def _(ISA, mo, plt, std_atmosphere_densities):
         par2.yaxis.label.set_color(p3.get_color())
 
         plt.title('SpaceX - JCSAT14 - Standard Atmosphere')
-    
+
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_spacex_jcsat14,)
 
@@ -152,7 +156,7 @@ def _(ISA, mo, plt, std_atmosphere_densities):
 def _(ISA, mo, plt, std_atmosphere_densities):
     def plot_nasa_sts124():
         (alts, rhos) = std_atmosphere_densities(0, 66000, 500)
-    
+
         nasa_alts = []
         nasa_throttles = []
         velocities = []
@@ -166,7 +170,7 @@ def _(ISA, mo, plt, std_atmosphere_densities):
             throttle = float(vals[1])
             alt = float(vals[2]) 
             velocity = float(vals[3])
-        
+
             nasa_alts.append(alt)
             nasa_throttles.append(throttle)
 
@@ -242,7 +246,7 @@ def _(ISA, mo, plt, std_atmosphere_densities):
             vals = line.split(',')
             alt = float(vals[0]) 
             velocity = float(vals[1])
-        
+
             airliner_alts.append(alt)
             airliner_speeds.append(velocity)
 
@@ -280,7 +284,7 @@ def _(ISA, mo, plt, std_atmosphere_densities):
         par2.yaxis.label.set_color(p3.get_color())
 
         plt.title('Airliner - Standard Atmosphere')
-    
+
         return mo.md(f"{mo.as_html(fig)}")
     return (plot_airliner,)
 
