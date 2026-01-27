@@ -101,6 +101,16 @@ Maximum dynamic pressure experienced by the X-15 rocket plane during its test fl
 
 Total Air Temperature (TAT) experienced during X-15 test flights for altitude missions and speed missions.
 
+## Trim
+
+#### [Inverted Trim](InvertedTrim.html)
+
+Trim calculation using JSBSim for inverted flight.
+
+#### [Trim Envelope](TrimEnvelope.html)
+
+Calculate the set of trim points for an aircraft over a range of airspeeds and range of flight path angles. The required thrust and AoA is indicated for each trim point.
+
 ## Work In Progress
 
 Notebooks that are still being worked on and not yet ready for prime time.
