@@ -111,6 +111,12 @@ Trim calculation using JSBSim for inverted flight.
 
 Calculate the set of trim points for an aircraft over a range of airspeeds and range of flight path angles. The required thrust and AoA is indicated for each trim point.
 
+## Landing
+
+#### [Crosswind Landing Crab Angle](CrossWindCrabAngle.html)
+
+Calculate the crab angle required to maintain a straight ground track during a crosswind landing. Also display a diagram of the vector components of the relative wind, aircraft heading and ground track.
+
 ## Work In Progress
 
 Notebooks that are still being worked on and not yet ready for prime time.
