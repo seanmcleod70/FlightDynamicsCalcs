@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Converted Document</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        h1 { font-size: 2rem; }
+        h2 { font-size: 1.5rem; }
+        code {
+            background-color: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 1rem;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        blockquote {
+            border-left: 4px solid #ddd;
+            padding-left: 1rem;
+            color: #666;
+            margin: 1rem 0;
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<p>Calculations, simulations with JSBSim and write up with Marimo notebooks</p>
+<p>Marimo notebooks available in the <a href="https://github.com/seanmcleod70/FlightDynamicsCalcs">Flight Dynamics Calcs repo</a>.</p>
+<h2>Roll Performance</h2>
+<h4><a href="A4SkyhawkRollPerformance.html">A4 Skyhawk Roll Performance</a></h4>
+<p>Can the A4 really roll at 720 deg/s or is it a tall tale? Using some aerodynamic data published by NASA let's take a look.</p>
+<h4><a href="FighterRollRates.html">Fighter Roll Rates</a></h4>
+<p>Comparing fighter roll rates based on published aerodynamic data.</p>
+<h2>Aircraft Carrier</h2>
+<h4><a href="AircraftCarrierFlightPathAngles.html">Aircraft Carrier Flight Path Angles</a></h4>
+<p>Flight path angle for carrier approaches based on wind over deck, approach speed and meatball angle.</p>
+<h2>Climb Performance</h2>
+<h3>Level Acceleration Test Technique</h3>
+<p>Examples of processing flight test data collected during a level acceleration test to determine climb performance.</p>
+<h4><a href="LevelAccelerationEnergyHeightiLevil.html">Level Acceleration - Energy Height - iLevil</a></h4>
+<h4><a href="LevelAccelerationEnergyHeightDynon.html">Level Acceleration - Energy Height - Dynon</a></h4>
+<h4><a href="LevelAccelerationNigelSpeedy.html">Level Acceleration - Nigel Speedy</a></h4>
+<h3>Trim Envelope</h3>
+<h4><a href="TrimEnvelope.html">Trim Envelope</a></h4>
+<p>Calculate the set of trim points for an aircraft over a range of airspeeds and range of flight path angles. The required thrust and AoA is indicated for each trim point.</p>
+<h3>Theory vs Simulation Trim Results</h3>
+<h4><a href="ClimbPerformance.html">Theory vs Simulation Trim Results</a></h4>
+<p>Review the theory of climb performance and then use JSBSim to compare the results to the theory using the excess power calculation and using JSBSim
+to calculate the maximum rate of climb (ROC) using it's trim routine. Lastly compare the results to those from a paper presenting climb performance
+from a TECS based autopilot.</p>
+<h2>VTOL</h2>
+<h4><a href="VTOLTake-offFailureOptions.html">VTOL Take-off Failure Options</a></h4>
+<p>Looking at some of the options in terms of engine failure(s) during a vertical take-off of an aircraft like the Pegasus Vertical Business Jet (VBJ).</p>
+<h2>Thrust Vectoring</h2>
+<h4><a href="ThrustVectoringAnalysis.html">Thrust Vectoring Analysis</a></h4>
+<p>Use JSBSim to compare how varying the thrust vector angle can minimize fuel burn for a given flight condition and compare the results to the
+NASA report - <a href="https://ntrs.nasa.gov/api/citations/20000034897/downloads/20000034897.pdf">Optimal Pitch Thrust-Vector Angle and Benefits for all Flight Regimes</a>.</p>
+<h2>Flight Test Techniques</h2>
+<h4><a href="RudderKick.html">Rudder Kick</a></h4>
+<p>Simulate a pilot performing a rudder kick test by inputing a rudder input based on a ramp input. Aileron input is also included to maintain a steady heading sideslip (SHSS). The time histories of the control inputs and beta (sideslip angle) are plotted.</p>
+<h2>Atmosphere</h2>
+<h4><a href="InternationalStandardAtmosphere.html">International Standard Atmosphere</a></h4>
+<p>Calculate the International Standard Atmosphere (ISA) temperature, pressure, density and speed of sound at a given altitude.</p>
+<h4><a href="CASTASMach.html">CAS TAS Mach</a></h4>
+<p>Plot routine to calculate and plot the relationship between CAS, TAS and Mach number as altitude varies using the ISA.</p>
+<h4><a href="EAS.html">EAS - Equivalent Airspeed</a></h4>
+<p>Explanation of Equivalent Airspeed (EAS) and how it relates to IAS, CAS and TAS. The relationship is plotted as altitude varies and airspeed varies.</p>
+<h2>Ground Effect</h2>
+<h4><a href="GroundEffectModels.html">Ground Effect Models</a></h4>
+<p>Comparison of different ground effect models to model the change in lift, drag and pitching moment as a function of height above ground.
+A 747 simulator model provided by Boeing, a generic airliner model provided by Airbus  for an autoland challenge and a common JSBSim model
+are detailed and compared.</p>
+<h2>Dynamic Pressure</h2>
+<h4><a href="MaxQ.html">Max Q - Maximum Dynamic Pressure</a></h4>
+<p>Maximum dynamic pressure experienced by a SpaceX rocket, the Space Shuttle and an airliner.</p>
+<h4><a href="X15MaxQ.html">X-15 Max Q</a></h4>
+<p>Maximum dynamic pressure experienced by the X-15 rocket plane during its test flights for altitude missions and speed missions.</p>
+<h2>Total Air Temperature (TAT)</h2>
+<h4><a href="X15TAT.html">X-15 TAT</a></h4>
+<p>Total Air Temperature (TAT) experienced during X-15 test flights for altitude missions and speed missions.</p>
+<h2>Trim</h2>
+<h4><a href="InvertedTrim.html">Inverted Trim</a></h4>
+<p>Trim calculation using JSBSim for inverted flight.</p>
+<h4><a href="TrimEnvelope.html">Trim Envelope</a></h4>
+<p>Calculate the set of trim points for an aircraft over a range of airspeeds and range of flight path angles. The required thrust and AoA is indicated for each trim point.</p>
+<h2>Landing</h2>
+<h4><a href="CrossWindCrabAngle.html">Crosswind Landing Crab Angle</a></h4>
+<p>Calculate the crab angle required to maintain a straight ground track during a crosswind landing. Also display a diagram of the vector components of the relative wind, aircraft heading and ground track.</p>
+<h2>Work In Progress</h2>
+<p>Notebooks that are still being worked on and not yet ready for prime time.</p>
+<h4><a href="GenericGlobalAerodynamicModel.html">Generic Global Aerodynamic Model</a></h4>
+<h4><a href="JSBSimAerodynamics.html">JSBSim Aerodynamics</a></h4>
+<h4><a href="TakeoffSpeedsVmuVrVlof.html">Takeoff Speeds Vmu Vr Vlof</a></h4>
+
+</body>
+</html>
